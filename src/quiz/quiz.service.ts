@@ -4,4 +4,13 @@ import { Repository } from 'typeorm';
 import { QuizEntity } from './entities/quiz.entity';
 
 @Injectable()
-export class QuizService {}
+export class QuizService {
+  constructor(
+    @InjectRepository(QuizEntity)
+    private quizRepository: Repository<QuizEntity>,
+  ) {}
+
+  findQuiz(id: number): Promise<QuizEntity> {
+    return this.quizRepository.findOne({ quizid: id });
+  }
+}

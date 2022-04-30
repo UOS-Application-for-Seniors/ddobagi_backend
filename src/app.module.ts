@@ -29,7 +29,7 @@ import { QuizModule } from './quiz/quiz.module';
       //password: 'Wlstnals07_',
       //database: 'test',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false,
+      synchronize: true,
     }),
     AuthModule,
     FileModule,

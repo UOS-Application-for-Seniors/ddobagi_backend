@@ -21,4 +21,8 @@ export class UserDataEntity {
   @OneToOne(() => UserEntity, { primary: true })
   @JoinColumn({ name: 'UserID' })
   user: UserEntity;
+
+  constructor(partial: Partial<UserDataEntity>) {
+    Object.assign(this, partial);
+  }
 }

@@ -25,5 +25,8 @@ export class UserEntity {
   address: string;
 
   @Column({ length: 60 })
-  signupVerifyToken: string;
+  phoneNumber: string;
+  constructor(partial: Partial<UserEntity>) {
+    Object.assign(this, partial);
+  }
 }

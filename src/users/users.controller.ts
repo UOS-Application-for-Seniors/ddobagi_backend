@@ -9,14 +9,15 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserEntity } from './entities/user.entity';
+import { RegisterUserDto } from './dto/create-register';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  async create(@Body() userEntity: UserEntity): Promise<void> {
-    return this.usersService.saveUser(userEntity);
+  async register(@Body() userData: RegisterUserDto): Promise<void> {
+    await this.usersService.saveUser(userData);
   }
 
   @Get(':id')

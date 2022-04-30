@@ -18,4 +18,8 @@ export class NOKEntity {
   @OneToOne(() => UserEntity)
   @JoinColumn({ name: 'UserID' })
   user: UserEntity;
+
+  constructor(partial: Partial<NOKEntity>) {
+    Object.assign(this, partial);
+  }
 }

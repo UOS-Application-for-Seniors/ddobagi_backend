@@ -23,7 +23,7 @@ import { QuizModule } from './quiz/quiz.module';
       port: 3306,
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
-      database: 'test',
+      database: 'heroku_73d80cf2120dd68',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),

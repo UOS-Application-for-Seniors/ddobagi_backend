@@ -12,26 +12,25 @@ export class AppController {
     private authService: AuthService,
   ) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
-
-  @Get('/hello')
-  getHello2(@Req() req: Request): string {
-    console.log(req);
-    return this.appService.getHello();
+  @Post('/auth/register')
+  async register(@Request() req) {
+    return this.authService.register(req);
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('/auth/login')
   async login(@Request() req) {
-    return this.authService.login(req.user);
+    return this.authService.authLogin(req.user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @Get('/SMS')
+  async sendSMS() {
+    return this.authService.sendSMS();
   }
 }

@@ -14,6 +14,7 @@ import { QuizModule } from './quiz/quiz.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.development.env',
     }),
     UsersModule,
     TypeOrmModule.forRoot({
@@ -24,13 +25,13 @@ import { QuizModule } from './quiz/quiz.module';
       password: process.env.DATABASE_PASSWORD,
       database: 'test',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: Boolean(process.env.DATABASE_SYNCHRONIZE),
+      synchronize: true,
     }),
     AuthModule,
     FileModule,
     QuizModule,
   ],
-  controllers: [AppController, QuizController],
-  providers: [AppService, QuizService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

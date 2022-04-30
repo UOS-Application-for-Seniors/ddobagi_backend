@@ -23,13 +23,14 @@ export class FileController {
     return 'hello';
   }
 
-  @Get(':path/:name/')
+  @Get(':path1/:name/')
   async download(
     @Res() res: Response,
-    @Param('path') path: string,
+    @Param('path1') path1: string,
+    //@Param('path2') path2: string,
     @Param('name') name: string,
     @Query('fn') fileName,
   ) {
-    res.download(`src/common/file/${path}/${name}`, fileName);
+    res.download(`src/common/file/${path1}/${name}`, fileName);
   }
 }

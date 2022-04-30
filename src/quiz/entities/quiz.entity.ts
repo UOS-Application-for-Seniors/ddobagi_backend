@@ -5,12 +5,14 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm/index';
 
-@Entity()
+@Entity('Quiz')
 export class QuizEntity {
   @PrimaryGeneratedColumn('rowid')
   quizid: number;
   @Column()
   quizdetail: string;
+  @Column()
+  quizchoicesdetail: string;
   @Column()
   quizdatapath: string;
   @Column()

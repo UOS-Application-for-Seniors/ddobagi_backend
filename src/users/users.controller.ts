@@ -6,10 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserEntity } from './entities/user.entity';
+import { AuthGuard } from '@nestjs/passport';
 import { RegisterUserDto } from './dto/create-register';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -35,8 +39,8 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 
-  @Get('check/:id')
-  checkExist(@Param('id') id: string) {
-    return this.usersService.checkExist(id);
+  @Post('check')
+  checkExist(@Request() body) {
+    return this.usersService.checkExist(body.body.username);
   }
 }

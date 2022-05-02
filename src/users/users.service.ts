@@ -79,4 +79,12 @@ export class UsersService {
   getUserData(userEntity: UserEntity) {
     const data = this.usersDataRepository.findOne({ user: userEntity });
   }
+
+  async getProfile(userid: string) {
+    const data = await this.usersDataRepository.findOne({
+      user: await this.usersRepository.findOne({ id: userid }),
+    });
+
+    return data;
+  }
 }

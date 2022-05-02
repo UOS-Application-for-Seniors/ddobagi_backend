@@ -29,6 +29,12 @@ export class AppController {
     return req.user;
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/auth/profile')
+  getProfile2(@Request() req) {
+    return this.authService.getProfile(req.user.id);
+  }
+
   @Get('/SMS')
   async sendSMS() {
     return this.authService.sendSMS();

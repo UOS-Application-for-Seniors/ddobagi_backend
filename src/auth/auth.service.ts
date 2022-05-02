@@ -41,6 +41,11 @@ export class AuthService {
     }
   }
 
+  async getProfile(userid: string) {
+    const data = await this.usersService.getProfile(userid);
+    return data;
+  }
+
   private makeSignature(timestamp: string): string {
     const uri = encodeURIComponent('ncp:sms:kr:284855416355:ddobagi');
     console.log(uri);

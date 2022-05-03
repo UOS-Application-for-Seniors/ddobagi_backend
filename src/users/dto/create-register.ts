@@ -27,7 +27,7 @@ export class RegisterUserDto {
   @Max(11)
   readonly userEducationLevel: number;
 
-  @IsDate()
+  @IsString()
   readonly userBirthDate: string;
 
   @IsString()
@@ -49,6 +49,6 @@ export class RegisterUserDto {
   readonly NOKPhoneNumber: string;
 
   @IsOptional()
-  @IsNumber()
+  @IsInt()
   readonly NOKNotificationDays: number;
 }

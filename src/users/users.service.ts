@@ -20,18 +20,17 @@ export class UsersService {
   ) {}
 
   async saveUser(user: RegisterUserDto) {
-    await this.usersRepository.save(
-      new UserEntity({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        userBirthDate: user.userBirthDate,
-        userEducationLevel: user.userEducationLevel,
-        phoneNumber: user.PhoneNumber,
-        address: user.Address,
-        password: user.password,
-      }),
-    );
+    const userEntity = new UserEntity({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      userBirthDate: user.userBirthDate,
+      userEducationLevel: user.userEducationLevel,
+      phoneNumber: user.PhoneNumber,
+      address: user.Address,
+      password: user.password,
+    });
+    await this.usersRepository.save(userEntity);
     await this.usersDataRepository.save(
       new UserDataEntity({
         field1: 0,
@@ -39,17 +38,20 @@ export class UsersService {
         field3: 0,
         field4: 0,
         CIST: 0,
-        user: await this.usersRepository.findOne({ id: user.id }),
+        user: userEntity,
       }),
     );
     if (user.NOKID) {
+      const date = new Date(Date.now());
+      date.setDate(date.getDate() + user.NOKNotificationDays);
       await this.NOKRepository.save(
         new NOKEntity({
           NOKID: user.NOKID,
           NOKName: user.NOKName,
           NOKPhoneNumber: user.NOKPhoneNumber,
           NOKNotificationDays: user.NOKNotificationDays,
-          user: await this.usersRepository.findOne({ id: user.id }),
+          NextNotificationDate: date.toJSON().substring(0, 10),
+          user: userEntity,
         }),
       );
     }
@@ -86,5 +88,39 @@ export class UsersService {
     });
 
     return data;
+  }
+
+  async checkDate(date: string) {
+    const data = await this.NOKRepository.find({
+      NextNotificationDate: date,
+    });
+
+    if (data) {
+      data.forEach(async (entity) => {
+        var CISTscore = 0;
+        const date = new Date(Date.now());
+
+        // Finding UserDataEntity with NOKEntity
+        const tmpEntity = await this.usersDataRepository.findOne({
+          user: entity.user,
+        });
+        CISTscore = tmpEntity.CIST;
+
+        // Sending SMS
+        this.SMS(entity.NOKPhoneNumber, CISTscore);
+
+        // Setting Next Notification Date
+        date.setDate(date.getDate() + entity.NOKNotificationDays);
+        entity.NextNotificationDate = date.toJSON().substring(0, 10);
+        console.log('Next Notification Date is ' + entity.NextNotificationDate);
+        this.NOKRepository.save(entity);
+      });
+    }
+  }
+
+  SMS(number: string, score: number) {
+    console.log(
+      'Successfully sent SMS to ' + number + ', Score is ' + score.toString(),
+    );
   }
 }

@@ -15,7 +15,10 @@ export class NOKEntity {
   @Column()
   NOKNotificationDays: number;
 
-  @OneToOne(() => UserEntity)
+  @Column({ type: 'date' })
+  NextNotificationDate: string;
+
+  @OneToOne(() => UserEntity, { eager: true })
   @JoinColumn({ name: 'UserID' })
   user: UserEntity;
 

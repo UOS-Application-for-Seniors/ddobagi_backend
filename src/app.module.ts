@@ -11,6 +11,7 @@ import { QuizService } from './quiz/quiz.service';
 import { QuizModule } from './quiz/quiz.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { BatchModule } from './batch/batch.module';
 
 @Module({
   imports: [
@@ -21,21 +22,22 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
     UsersModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: process.env.DATABASE_HOST,
+      //host: process.env.DATABASE_HOST,
       port: 3306,
-      username: process.env.DATABASE_USERNAME,
-      password: process.env.DATABASE_PASSWORD,
-      database: 'heroku_73d80cf2120dd68',
-      //host: 'localhost',
-      //username: 'root',
-      //password: 'Wlstnals07_',
-      //database: 'test',
+      //username: process.env.DATABASE_USERNAME,
+      //password: process.env.DATABASE_PASSWORD,
+      //database: 'heroku_73d80cf2120dd68',
+      host: 'localhost',
+      username: 'root',
+      password: 'Wlstnals07_',
+      database: 'test',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: false,
     }),
     AuthModule,
     FileModule,
     QuizModule,
+    BatchModule,
   ],
   controllers: [AppController],
   providers: [

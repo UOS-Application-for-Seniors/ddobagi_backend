@@ -12,6 +12,7 @@ import { QuizModule } from './quiz/quiz.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { BatchModule } from './batch/batch.module';
+import { SmsModule } from './sms/sms.module';
 
 @Module({
   imports: [
@@ -38,14 +39,15 @@ import { BatchModule } from './batch/batch.module';
     FileModule,
     QuizModule,
     BatchModule,
+    SmsModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    //{
-    //  provide: APP_GUARD,
-    //  useClass: JwtAuthGuard,
-    //},
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
   ],
 })
 export class AppModule {}

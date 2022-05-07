@@ -19,13 +19,11 @@ export class UserEntity {
   userBirthDate: string;
 
   @Column({ length: 60 })
-  email: string;
-
-  @Column({ length: 60 })
   address: string;
 
-  @Column({ length: 60 })
-  phoneNumber: string;
+  @Column()
+  userRefreshToken: string;
+
   constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);
   }

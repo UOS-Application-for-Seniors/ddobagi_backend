@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import * as crypto from 'crypto';
-import axios from 'axios';
+import { jwtConstants } from './constants';
+import { jwtRefreshConstants } from './constants';
 
 @Injectable()
 export class AuthService {
@@ -27,8 +27,35 @@ export class AuthService {
 
   async authLogin(user: any) {
     const payload = { username: user.id, email: user.email, name: user.name };
+    const tmp_access = this.jwtService.sign(payload, {
+      secret: jwtConstants.secret,
+      expiresIn: '180s',
+    });
+    const refresh_token = this.jwtService.sign(payload, {
+      secret: 'secret',
+      expiresIn: '36000s',
+    });
+    this.usersService.updateUserRefreshToken(user.id, refresh_token);
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: tmp_access,
+      access_token_expiration: '1800000',
+      refresh_token: refresh_token,
+      refresh_token_expiration: '36000000',
+      user_address: await this.usersService.getAddress(user.id),
+    };
+  }
+
+  makeAccessToken(userid: string, email: string, name: string) {
+    const payload = { username: userid, email: email, name: name };
+    const tmp_access = this.jwtService.sign(payload, {
+      secret: jwtConstants.secret,
+      expiresIn: '180s',
+    });
+
+    return {
+      access_token: tmp_access,
+      access_token_expiration: '1800000',
     };
   }
 
@@ -44,67 +71,5 @@ export class AuthService {
   async getProfile(userid: string) {
     const data = await this.usersService.getProfile(userid);
     return data;
-  }
-
-  private makeSignature(timestamp: string): string {
-    const uri = encodeURIComponent('ncp:sms:kr:284855416355:ddobagi');
-    console.log(uri);
-    const message = [];
-    const hmac = crypto.createHmac(
-      'sha256',
-      'e6k71gxquU0f5InGEqPPcur58X4XNr8neK8m4Znn',
-    );
-    const space = ' ';
-    const newLine = '\n';
-    const method = 'POST';
-    message.push(method);
-    message.push(space);
-    message.push('/sms/v2/services/ncp:sms:kr:284855416355:ddobagi/messages');
-    message.push(newLine);
-    message.push(timestamp);
-    message.push(newLine);
-    message.push('VrCjxGsF2m4MDshEdCjQ');
-    //message 배열에 위의 내용들을 담아준 후에
-    const signature = hmac.update(message.join('')).digest('base64');
-    //message.join('') 으로 만들어진 string 을 hmac 에 담고, base64로 인코딩한다
-    console.log(signature.toString());
-    return signature.toString(); // toString()이 없었어서 에러가 자꾸 났었는데, 반드시 고쳐야함.
-  }
-
-  async sendSMS(): Promise<void> {
-    const timestamp = Date.now().toString();
-    const body = {
-      type: 'SMS',
-      contentType: 'COMM',
-      countryCode: '82',
-      from: '01033045027', // 발신자 번호
-      content: `Nest js SMS Service TEST`,
-      messages: [
-        {
-          to: '01023698672', // 수신자 번호
-        },
-      ],
-    };
-    const options = {
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'x-ncp-iam-access-key': 'VrCjxGsF2m4MDshEdCjQ',
-        'x-ncp-apigw-timestamp': timestamp,
-        'x-ncp-apigw-signature-v2': this.makeSignature(timestamp),
-      },
-    };
-    axios
-      .post(
-        'https://sens.apigw.ntruss.com/sms/v2/services/ncp:sms:kr:284855416355:ddobagi/messages',
-        body,
-        options,
-      )
-      .then(async (res) => {
-        console.log('good');
-      })
-      .catch((err) => {
-        console.error(err.response.data);
-        throw new InternalServerErrorException();
-      });
   }
 }

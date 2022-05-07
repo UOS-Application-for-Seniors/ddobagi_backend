@@ -16,9 +16,6 @@ export class RegisterUserDto {
   @IsString()
   readonly name: string;
 
-  @IsEmail()
-  readonly email: string;
-
   @IsString()
   readonly password: string;
 
@@ -32,9 +29,6 @@ export class RegisterUserDto {
 
   @IsString()
   readonly Address: string;
-
-  @IsString()
-  readonly PhoneNumber: string;
 
   @IsOptional()
   @IsString()

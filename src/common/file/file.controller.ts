@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { Public } from 'src/auth/jwt-auth.guard';
 
 @Controller('file')
 export class FileController {
@@ -23,14 +24,15 @@ export class FileController {
     return 'hello';
   }
 
-  @Get(':path1/:name/')
+  @Public()
+  @Get(':path1/:path2/:name/')
   async download(
     @Res() res: Response,
     @Param('path1') path1: string,
-    //@Param('path2') path2: string,
+    @Param('path2') path2: string,
     @Param('name') name: string,
     @Query('fn') fileName,
   ) {
-    res.download(`src/common/file/${path1}/${name}`, fileName);
+    res.download(`src/common/file/quiz/${path1}/${path2}/${name}`, fileName);
   }
 }

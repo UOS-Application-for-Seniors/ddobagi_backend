@@ -3,9 +3,6 @@ import { UserEntity } from './user.entity';
 
 @Entity('NOK')
 export class NOKEntity {
-  @PrimaryColumn()
-  NOKID: string;
-
   @Column({ length: 30 })
   NOKName: string;
 
@@ -18,7 +15,7 @@ export class NOKEntity {
   @Column({ type: 'date' })
   NextNotificationDate: string;
 
-  @OneToOne(() => UserEntity, { eager: true })
+  @OneToOne(() => UserEntity, { primary: true, eager: true })
   @JoinColumn({ name: 'UserID' })
   user: UserEntity;
 

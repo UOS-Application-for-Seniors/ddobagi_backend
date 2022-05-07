@@ -15,8 +15,6 @@ export class TaskService {
     const date = new Date();
     // date.setTime(Date.now());
     // this.logger.log(date.toJSON().substring(0, 10)); expected output "2022-05-03"
-    console.log(
-      await this.userService.checkDate(date.toJSON().substring(0, 10)),
-    );
+    await this.userService.checkDate(date.toJSON().substring(0, 10));
   }
 }

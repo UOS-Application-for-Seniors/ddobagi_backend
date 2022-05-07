@@ -6,6 +6,8 @@ import { UserDataEntity } from './entities/userData.entity';
 import { RegisterUserDto } from './dto/create-register';
 import { NOKEntity } from './entities/NOK.entity';
 import { use } from 'passport';
+import { SmsService } from 'src/sms/sms.service';
+import { response } from 'express';
 
 @Injectable()
 export class UsersService {
@@ -16,19 +18,18 @@ export class UsersService {
     private usersDataRepository: Repository<UserDataEntity>,
     @InjectRepository(NOKEntity)
     private NOKRepository: Repository<NOKEntity>,
-    private connection: Connection,
+    private SMSService: SmsService,
   ) {}
 
   async saveUser(user: RegisterUserDto) {
     const userEntity = new UserEntity({
       id: user.id,
       name: user.name,
-      email: user.email,
       userBirthDate: user.userBirthDate,
       userEducationLevel: user.userEducationLevel,
-      phoneNumber: user.PhoneNumber,
       address: user.Address,
       password: user.password,
+      userRefreshToken: '',
     });
     await this.usersRepository.save(userEntity);
     await this.usersDataRepository.save(
@@ -41,12 +42,11 @@ export class UsersService {
         user: userEntity,
       }),
     );
-    if (user.NOKID) {
+    if (user.NOKName) {
       const date = new Date(Date.now());
       date.setDate(date.getDate() + user.NOKNotificationDays);
       await this.NOKRepository.save(
         new NOKEntity({
-          NOKID: user.NOKID,
           NOKName: user.NOKName,
           NOKPhoneNumber: user.NOKPhoneNumber,
           NOKNotificationDays: user.NOKNotificationDays,
@@ -57,20 +57,8 @@ export class UsersService {
     }
   }
 
-  findAll() {
-    return `This action returns all users`;
-  }
-
   async findOne(userid: string): Promise<UserEntity> {
     return this.usersRepository.findOne({ id: userid });
-  }
-
-  update(id: number) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
   }
 
   async checkExist(userid: string) {
@@ -78,8 +66,12 @@ export class UsersService {
     return count;
   }
 
-  getUserData(userEntity: UserEntity) {
-    const data = this.usersDataRepository.findOne({ user: userEntity });
+  async getUserData(userid: string): Promise<UserDataEntity> {
+    const data = this.usersDataRepository.findOne({
+      user: await this.usersRepository.findOne({ id: userid }),
+    });
+
+    return data;
   }
 
   async getProfile(userid: string) {
@@ -90,11 +82,22 @@ export class UsersService {
     return data;
   }
 
+  async getAddress(userid: string) {
+    const data = await this.usersRepository.findOne({ id: userid });
+
+    return data.address;
+  }
+
+  async updateUserRefreshToken(userid: string, token: string) {
+    let data = await this.usersRepository.findOne({ id: userid });
+    data.userRefreshToken = token;
+    await this.usersRepository.save(data);
+  }
+
   async checkDate(date: string) {
     const data = await this.NOKRepository.find({
       NextNotificationDate: date,
     });
-
     if (data) {
       data.forEach(async (entity) => {
         var CISTscore = 0;
@@ -119,8 +122,10 @@ export class UsersService {
   }
 
   SMS(number: string, score: number) {
-    console.log(
-      'Successfully sent SMS to ' + number + ', Score is ' + score.toString(),
-    );
+    try {
+      this.SMSService.sendSMS(number, score);
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

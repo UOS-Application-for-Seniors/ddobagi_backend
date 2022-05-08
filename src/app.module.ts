@@ -33,7 +33,7 @@ import { SmsModule } from './sms/sms.module';
       //password: 'Wlstnals07_',
       //database: 'test',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false,
+      synchronize: true,
     }),
     AuthModule,
     FileModule,

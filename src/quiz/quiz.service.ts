@@ -77,7 +77,7 @@ export class QuizService {
     const body = {
       key: '4B46089444815F3C371D5CAA2987722B',
       q: '',
-      req_type: 'JSON',
+      req_type: 'json',
       num: 100,
       advanced: 'y',
       type1: type1,

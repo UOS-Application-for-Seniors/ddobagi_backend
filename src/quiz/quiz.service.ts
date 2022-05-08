@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import axios from 'axios';
 import { UserDataDto } from 'src/users/dto/user-data-dto';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { Not, Repository } from 'typeorm';
@@ -67,6 +68,36 @@ export class QuizService {
     });
 
     return games;
+  }
+
+  async getDICT() {
+    const type1 = ['word'];
+    const pos1 = [1];
+    const cat = [24];
+    const body = {
+      key: '4B46089444815F3C371D5CAA2987722B',
+      q: '',
+      req_type: 'JSON',
+      num: 100,
+      advanced: 'y',
+      type1: type1,
+      pos: pos1,
+      cat: cat,
+    };
+    const options = {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+    };
+    axios
+      .post('https://stdict.korean.go.kr/api/search.do', body, options)
+      .then(async (res) => {
+        return res;
+      })
+      .catch((err) => {
+        console.error(err.response.data);
+        throw new InternalServerErrorException();
+      });
   }
 
   dayToString(day: number) {

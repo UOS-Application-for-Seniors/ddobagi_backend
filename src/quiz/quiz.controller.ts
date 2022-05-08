@@ -37,4 +37,9 @@ export class QuizController {
   async getCIST(@Req() req) {
     return this.quizService.getCIST(req.user.id);
   }
+
+  @Get('/DICT')
+  async getDICT() {
+    return this.quizService.getDICT();
+  }
 }

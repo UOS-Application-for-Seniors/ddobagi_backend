@@ -22,6 +22,8 @@ import { SmsModule } from './sms/sms.module';
     }),
     UsersModule,
     TypeOrmModule.forRoot({
+      type: 'mysql',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
       username: 'b9d117d8a56270',
       password: '4913483b',
       port: 3306,

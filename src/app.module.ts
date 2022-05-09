@@ -29,7 +29,7 @@ import { SmsModule } from './sms/sms.module';
       port: 3306,
       host: 'us-cdbr-east-05.cleardb.net',
       database: 'heroku_73d80cf2120dd68',
-      synchronize: true,
+      synchronize: false,
     }),
     AuthModule,
     FileModule,

@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Request,
   Body,
   Req,
   Patch,
@@ -13,10 +14,15 @@ import { QuizService } from './quiz.service';
 import { QuizEntity } from './entities/quiz.entity';
 import { UserDataDto } from 'src/users/dto/user-data-dto';
 import { Public } from 'src/auth/jwt-auth.guard';
+import { UsersService } from 'src/users/users.service';
+import { ResultDto } from './dto/result-dto';
 
 @Controller('quiz')
 export class QuizController {
-  constructor(private quizService: QuizService) {}
+  constructor(
+    private quizService: QuizService,
+    private userService: UsersService,
+  ) {}
 
   @Get(':gameid/:quizid')
   @Public()
@@ -34,12 +40,34 @@ export class QuizController {
   }
 
   @Get('/CIST')
-  async getCIST(@Req() req) {
+  async getCIST(@Request() req) {
+    console.log(req.user);
     return this.quizService.getCIST(req.user.id);
   }
 
+  @Public()
+  @Post('/DICTQuiz')
+  async getDICTQuizScore(@Body() req) {
+    return this.quizService.getDICTQuizScore(req.result);
+  }
+
+  @Post('/CISTADDResult')
+  async addCISTResult(@Body() body: ResultDto, @Request() req) {
+    return this.userService.addCISTResult(body.gameID, body.score, req.user.id);
+  }
+
+  //@Post('/CISTResult')
+
+  /*
   @Get('/DICT')
   async getDICT() {
     return this.quizService.getDICT();
   }
+
+  @Public()
+  @Post('/DICT2')
+  async getDICT2(@Req() request) {
+    return this.quizService.getDICT2();
+  }
+  */
 }

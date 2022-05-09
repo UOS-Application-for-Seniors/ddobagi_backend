@@ -29,19 +29,19 @@ export class AuthService {
     const payload = { username: user.id, email: user.email, name: user.name };
     const tmp_access = this.jwtService.sign(payload, {
       secret: jwtConstants.secret,
-      expiresIn: '180s',
+      expiresIn: '600s',
     });
     const refresh_token = this.jwtService.sign(payload, {
       secret: 'secret',
-      expiresIn: '36000s',
+      expiresIn: '600000s',
     });
     this.usersService.updateUserRefreshToken(user.id, refresh_token);
 
     return {
       access_token: tmp_access,
-      access_token_expiration: '1800000',
+      access_token_expiration: '600000',
       refresh_token: refresh_token,
-      refresh_token_expiration: '36000000',
+      refresh_token_expiration: '600000000',
       user_address: await this.usersService.getAddress(user.id),
     };
   }
@@ -50,12 +50,12 @@ export class AuthService {
     const payload = { username: userid, email: email, name: name };
     const tmp_access = this.jwtService.sign(payload, {
       secret: jwtConstants.secret,
-      expiresIn: '180s',
+      expiresIn: '600s',
     });
 
     return {
       access_token: tmp_access,
-      access_token_expiration: '1800000',
+      access_token_expiration: '600000',
     };
   }
 
@@ -72,4 +72,6 @@ export class AuthService {
     const data = await this.usersService.getProfile(userid);
     return data;
   }
+
+  async refreshValidation() {}
 }

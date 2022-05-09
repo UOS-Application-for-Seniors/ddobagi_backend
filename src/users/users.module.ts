@@ -7,10 +7,18 @@ import { UserDataEntity } from './entities/userData.entity';
 import { NOKEntity } from './entities/NOK.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { SmsModule } from 'src/sms/sms.module';
+import { UserRecordEntity } from './entities/userRecord.entity';
+import { GameEntity } from 'src/quiz/entities/game.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity, UserDataEntity, NOKEntity]),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      UserDataEntity,
+      NOKEntity,
+      UserRecordEntity,
+      GameEntity,
+    ]),
     SmsModule,
   ],
   controllers: [UsersController],

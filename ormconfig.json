@@ -1,0 +1,15 @@
+{
+  "type": "mysql",
+  "host": "localhost",
+  "port": 3306,
+  "username": "root",
+  "password": "Wlstnals07_",
+  "database": "test",
+  "entities": ["dist/**/entities/*.entity{.ts,.js}"],
+  "synchronize": false,
+  "migrations": ["dist/migrations/*{.ts,.js}"],
+  "cli": {
+    "migrationsDir": "src/migrations"
+  },
+  "migrationsTableName": "migrations"
+}

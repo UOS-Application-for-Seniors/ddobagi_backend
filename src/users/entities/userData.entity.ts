@@ -18,7 +18,10 @@ export class UserDataEntity {
   @Column()
   CIST: number;
 
-  @OneToOne(() => UserEntity, { primary: true })
+  @Column()
+  PastCIST: number;
+
+  @OneToOne(() => UserEntity, { primary: true, eager: true })
   @JoinColumn({ name: 'UserID' })
   user: UserEntity;
 

@@ -3,9 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import { UserDataDto } from 'src/users/dto/user-data-dto';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { Not, Repository } from 'typeorm';
+import { Entity, Not, Repository } from 'typeorm';
 import { GameEntity } from './entities/game.entity';
 import { QuizEntity } from './entities/quiz.entity';
+// import * as dictJSON from '../966314_8026.json';
+import { AnimalEntity } from './entities/animal.entity';
+import { json } from 'stream/consumers';
+import { delay } from 'rxjs';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class QuizService {
@@ -16,6 +21,9 @@ export class QuizService {
     private gameRepository: Repository<GameEntity>,
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(AnimalEntity)
+    private animalRepository: Repository<AnimalEntity>,
+    private readonly userService: UsersService,
   ) {}
 
   async findQuiz(gameid: number, quizid: number): Promise<QuizEntity> {
@@ -58,47 +66,61 @@ export class QuizService {
     return shuffled;
   }
 
-  async getCIST(userid: String) {
-    /* TODO MAKE RECOMMENDATION ALGORITHM
-    return Array;
-    */
+  async getCIST(userid: string) {
     const games = await this.gameRepository.find({
       where: { field: 'CIST' },
       order: { gameid: 'ASC' },
     });
 
+    this.userService.resetCIST(userid);
+
     return games;
   }
 
-  async getDICT() {
-    const type1 = ['word'];
-    const pos1 = [1];
-    const cat = [24];
-    const body = {
-      key: '4B46089444815F3C371D5CAA2987722B',
-      q: '',
-      req_type: 'json',
-      num: 100,
-      advanced: 'y',
-      type1: type1,
-      pos: pos1,
-      cat: cat,
+  async getDICTQuizScore(answer: string) {
+    var score = 0;
+    var result_array = answer.split(',');
+
+    for (const word of result_array) {
+      const tmp = await this.animalRepository.findOne({ animalName: word });
+      if (tmp) {
+        score++;
+      }
+    }
+
+    return {
+      score: score,
     };
-    const options = {
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-    };
-    axios
-      .post('https://stdict.korean.go.kr/api/search.do', body, options)
-      .then(async (res) => {
-        return res;
-      })
-      .catch((err) => {
-        console.error(err.response.data);
-        throw new InternalServerErrorException();
-      });
   }
+
+  /*
+  async getDICT2() {
+    var word = dictJSON.channel.item;
+    var words = new Array<string>();
+
+    word.forEach(async (wordData) => {
+      var temp = wordData.word_info.word;
+      temp = temp.toString().replace('-', '');
+      var dictWord = temp.replace(/[0-9]/g, '');
+      console.log('replaced word is ' + dictWord);
+      if (words.includes(dictWord)) {
+      } else {
+        words.push(dictWord);
+      }
+    });
+    await this.getAnimalData(words);
+  }
+
+  async getAnimalData(animalName: Array<string>) {
+    animalName.forEach(async (name) => {
+      await this.animalRepository.save(
+        new AnimalEntity({
+          animalName: name,
+        }),
+      );
+    });
+  }
+  */
 
   dayToString(day: number) {
     switch (day) {
@@ -120,7 +142,7 @@ export class QuizService {
       case 6:
         return '토요일';
         break;
-      case 7:
+      case 0:
         return '일요일';
         break;
       default:

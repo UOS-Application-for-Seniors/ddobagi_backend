@@ -8,6 +8,10 @@ import { NOKEntity } from './entities/NOK.entity';
 import { use } from 'passport';
 import { SmsService } from 'src/sms/sms.service';
 import { response } from 'express';
+import { VirtualAction } from 'rxjs';
+import { UserRecordEntity } from './entities/userRecord.entity';
+import { GameEntity } from 'src/quiz/entities/game.entity';
+import { time } from 'console';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +22,12 @@ export class UsersService {
     private usersDataRepository: Repository<UserDataEntity>,
     @InjectRepository(NOKEntity)
     private NOKRepository: Repository<NOKEntity>,
+    @InjectRepository(UserRecordEntity)
+    private userRecordRepository: Repository<UserRecordEntity>,
+    @InjectRepository(GameEntity)
+    private gameRepository: Repository<GameEntity>,
     private SMSService: SmsService,
+    private connection: Connection,
   ) {}
 
   async saveUser(user: RegisterUserDto) {
@@ -67,8 +76,9 @@ export class UsersService {
   }
 
   async getUserData(userid: string): Promise<UserDataEntity> {
-    const data = this.usersDataRepository.findOne({
-      user: await this.usersRepository.findOne({ id: userid }),
+    const user = await this.usersRepository.findOne({ id: userid });
+    const data = await this.usersDataRepository.findOne({
+      user: user,
     });
 
     return data;
@@ -86,6 +96,40 @@ export class UsersService {
     const data = await this.usersRepository.findOne({ id: userid });
 
     return data.address;
+  }
+
+  async getUserResult(userid: string) {
+    console.log(userid);
+    // get user record  using userid
+
+    const data: UserRecordEntity[] = await this.connection
+      .createQueryBuilder(UserRecordEntity, 'record')
+      .leftJoinAndSelect('record.game', 'game')
+      .orderBy('game.gamename', 'ASC')
+      .addOrderBy('difficulty', 'ASC')
+      .getMany();
+
+    var returnObjectArray = new Array<ReturnObject>();
+
+    data.forEach(async (gameRecord) => {
+      // calculate star
+      const stars = gameRecord.correctPlay * 2 + gameRecord.totalPlay;
+      // calculate correctRate
+      const correctRate =
+        Math.ceil((gameRecord.correctPlay / gameRecord.totalPlay) * 100) / 100;
+      // const difficulty = gameRecord.difficulty
+      const gameName = gameRecord.game.gamename;
+      // return star, Rate, difficulty, gamename
+      const newObject = new ReturnObject({
+        gameName: gameName,
+        stars: stars,
+        correctRate: correctRate,
+        difficulty: gameRecord.difficulty,
+      });
+      returnObjectArray.push(newObject);
+    });
+
+    return returnObjectArray;
   }
 
   async updateUserRefreshToken(userid: string, token: string) {
@@ -121,11 +165,103 @@ export class UsersService {
     }
   }
 
+  async resetCIST(userid: string) {
+    const userData = await this.getUserData(userid);
+
+    userData.PastCIST = userData.CIST;
+    userData.CIST = 0;
+
+    await this.usersDataRepository.save(userData);
+  }
+
+  async addCISTResult(gameid: string, score: number, userid: string) {
+    var user = await this.usersRepository.findOne({ id: userid });
+    var userData = await this.usersDataRepository.findOne({
+      user: user,
+    });
+
+    /*
+    var userData = await this.usersDataRepository.findOne({
+      where: {user : { id : userid}}
+    });
+    */
+
+    userData.CIST = score + userData.CIST;
+    await this.usersDataRepository.save(userData);
+  }
+
+  async saveGameResult(
+    userid: string,
+    gameid: string,
+    score: string,
+    difficulty: string,
+  ) {
+    //difficulty = '0';
+    var gameID = parseInt(gameid);
+    var difficultyInt = parseInt(difficulty);
+
+    var game = await this.gameRepository.findOne({ gameid: gameID });
+    var user = await this.usersRepository.findOne({ id: userid });
+
+    console.log('here');
+    console.log(game);
+
+    var resultEntity = await this.userRecordRepository.findOne({
+      where: {
+        game: { gameid: gameid },
+        user: { id: userid },
+        difficulty: difficultyInt,
+      },
+    });
+
+    console.log('here2');
+
+    if (resultEntity == undefined) {
+      var resultEntity = new UserRecordEntity({
+        totalPlay: 0,
+        correctPlay: 0,
+        game: game,
+        user: user,
+        difficulty: difficultyInt,
+      });
+
+      await this.userRecordRepository.create(resultEntity);
+    }
+
+    switch (score) {
+      case '0':
+        resultEntity.totalPlay = resultEntity.totalPlay + 1;
+        break;
+      case '1':
+        resultEntity.correctPlay = resultEntity.correctPlay + 1;
+        resultEntity.totalPlay = resultEntity.totalPlay + 1;
+        break;
+      case '2':
+        resultEntity.correctPlay = resultEntity.correctPlay + 0.5;
+        resultEntity.totalPlay = resultEntity.totalPlay + 1;
+        break;
+    }
+
+    await this.userRecordRepository.save(resultEntity);
+    console.log('saveGameResult Complete');
+  }
+
   SMS(number: string, score: number) {
     try {
       this.SMSService.sendSMS(number, score);
     } catch (e) {
       console.log(e);
     }
+  }
+}
+
+export class ReturnObject {
+  gameName: string;
+  stars: number;
+  correctRate: number;
+  difficulty: number;
+
+  constructor(partial: Partial<ReturnObject>) {
+    Object.assign(this, partial);
   }
 }

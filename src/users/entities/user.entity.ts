@@ -1,5 +1,6 @@
 import internal from 'stream';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, OneToMany } from 'typeorm';
+import { UserRecordEntity } from './userRecord.entity';
 
 @Entity('User')
 export class UserEntity {

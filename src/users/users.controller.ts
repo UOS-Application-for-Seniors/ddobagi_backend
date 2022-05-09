@@ -26,14 +26,24 @@ export class UsersController {
   }
 
   @Public()
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
-  }
-
-  @Public()
   @Post('check')
   checkExist(@Request() body) {
     return this.usersService.checkExist(body.body.username);
+  }
+
+  @Get('getUserResult')
+  async getUserResult(@Request() req) {
+    console.log(req);
+    return this.usersService.getUserResult(req.user.id);
+  }
+
+  @Post('saveGameResult')
+  saveGameResult(@Request() req, @Body() body) {
+    return this.usersService.saveGameResult(
+      req.user.id,
+      body.gameid,
+      body.score,
+      body.difficulty,
+    );
   }
 }

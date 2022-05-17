@@ -16,7 +16,19 @@ import { UserDataDto } from 'src/users/dto/user-data-dto';
 import { Public } from 'src/auth/jwt-auth.guard';
 import { UsersService } from 'src/users/users.service';
 import { ResultDto } from './dto/result-dto';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiExcludeEndpoint,
+  ApiOAuth2,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('Quiz')
 @Controller('quiz')
 export class QuizController {
   constructor(
@@ -25,6 +37,21 @@ export class QuizController {
   ) {}
 
   @Public()
+  @ApiParam({
+    name: 'gameid',
+    required: true,
+    description: 'gameid URL',
+  })
+  @ApiParam({
+    name: 'quizid',
+    required: true,
+    description: 'quizid URL',
+  })
+  @ApiOperation({
+    summary: 'Quiz 정보 획득',
+    description: 'gameid와 quizid를 이용하여 Quiz의 정보를 획득합니다.',
+  })
+  @ApiResponse({ type: QuizEntity })
   @Get(':gameid/:quizid')
   getQuizInformation(
     @Param('gameid') gameid: number,
@@ -34,29 +61,55 @@ export class QuizController {
   }
 
   @Public()
+  @ApiExcludeEndpoint()
   @Post('/select')
   async getGameSelectionList() {
     return this.quizService.getSelectionList();
   }
 
-  @Post()
-  @Public()
-  async getRecommendation(dto: UserDataDto) {
-    return this.quizService.getRecommendation(dto);
-  }
-
   @Get('/CIST')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: 'CIST 정보 획득',
+    description: 'CIST 퀴즈들의 배열을 Return합니다',
+  })
+  @ApiCreatedResponse({ type: QuizEntity })
   async getCIST(@Request() req) {
     console.log(req.user);
     return this.quizService.getCIST(req.user.id);
   }
 
   @Public()
+  @ApiOperation({
+    summary: '동물 이름 퀴즈 정답체크',
+    description: 'MySQL의 동물이름 사전을 이용하여 정답 개수를 확인합니다.',
+  })
+  @ApiCreatedResponse({ type: Number })
+  @ApiBody({
+    schema: {
+      properties: {
+        result: { type: 'string', example: '개,고양이,장난감' },
+      },
+    },
+  })
   @Post('/DICTQuiz')
   async getDICTQuizScore(@Body() req) {
     return this.quizService.getDICTQuizScore(req.result);
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'CIST 점수 추가',
+    description: 'MySQL에 있는 유저 정보에 CIST 점수를 추가합니다',
+  })
+  @ApiBody({
+    schema: {
+      properties: {
+        gameID: { type: 'string' },
+        score: { type: 'string' },
+      },
+    },
+  })
   @Post('/CISTADDResult')
   async addCISTResult(@Body() body: ResultDto, @Request() req) {
     return this.userService.addCISTResult(body.gameID, body.score, req.user.id);

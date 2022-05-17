@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { setupSwagger } from 'src/util/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors();
+  setupSwagger(app);
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   Entity,
@@ -9,16 +10,27 @@ import { GameEntity } from './game.entity';
 
 @Entity('Quiz')
 export class QuizEntity {
+  @ApiProperty({ description: '퀴즈 번호' })
   @PrimaryGeneratedColumn('rowid')
   quizid: number;
+
+  @ApiProperty({ description: '퀴즈 설명' })
   @Column()
   quizdetail: string;
+
+  @ApiProperty({ description: '퀴즈 문제 보기' })
   @Column()
   quizchoicesdetail: string;
+
+  @ApiProperty({ description: '퀴즈 난이도' })
   @Column()
   difficulty: string;
+
+  @ApiProperty({ description: '퀴즈 정답' })
   @Column()
   quizanswer: string;
+
+  @ApiProperty({ description: '퀴즈 TTS' })
   @Column()
   quizTTS: string;
 

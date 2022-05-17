@@ -12,6 +12,7 @@ import { VirtualAction } from 'rxjs';
 import { UserRecordEntity } from './entities/userRecord.entity';
 import { GameEntity } from 'src/quiz/entities/game.entity';
 import { time } from 'console';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Injectable()
 export class UsersService {
@@ -263,9 +264,14 @@ export class UsersService {
 }
 
 export class ReturnObject {
+  @ApiProperty()
   gameName: string;
+
+  @ApiProperty()
   stars: number;
+  @ApiProperty()
   correctRate: number;
+  @ApiProperty()
   difficulty: number;
 
   constructor(partial: Partial<ReturnObject>) {

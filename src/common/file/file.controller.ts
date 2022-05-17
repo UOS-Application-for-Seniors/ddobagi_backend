@@ -11,7 +11,9 @@ import {
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { Public } from 'src/auth/jwt-auth.guard';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('file')
 export class FileController {
   constructor(private config: ConfigService) {}

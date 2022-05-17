@@ -8,6 +8,7 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { jwtRefreshConstants } from './constants';
+import { LoginDto } from 'src/users/dto/sign-in-dto';
 
 @Injectable()
 export class AuthService {
@@ -25,8 +26,11 @@ export class AuthService {
     return null;
   }
 
-  async authLogin(user: any) {
-    const payload = { username: user.id, email: user.email, name: user.name };
+  async authLogin(logindto: LoginDto) {
+    const payload = {
+      username: logindto.username,
+      password: logindto.password,
+    };
     const tmp_access = this.jwtService.sign(payload, {
       secret: jwtConstants.secret,
       expiresIn: '600s',
@@ -35,14 +39,14 @@ export class AuthService {
       secret: 'secret',
       expiresIn: '600000s',
     });
-    this.usersService.updateUserRefreshToken(user.id, refresh_token);
+    this.usersService.updateUserRefreshToken(logindto.username, refresh_token);
 
     return {
       access_token: tmp_access,
       access_token_expiration: '600000',
       refresh_token: refresh_token,
       refresh_token_expiration: '600000000',
-      user_address: await this.usersService.getAddress(user.id),
+      user_address: await this.usersService.getAddress(logindto.username),
     };
   }
 

@@ -7,6 +7,7 @@ import {
   Request,
   UseGuards,
   Res,
+  Body,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -18,6 +19,18 @@ import { QuizService } from './quiz/quiz.service';
 import { UsersService } from './users/users.service';
 import { UserDataDto } from './users/dto/user-data-dto';
 import { JwtRefreshGuard } from './auth/jwt-refresh-token-auth.guard';
+import {
+  ApiBasicAuth,
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { RegisterUserDto } from './users/dto/create-register';
+import { LoginDto } from './users/dto/sign-in-dto';
+import { GameEntity } from './quiz/entities/game.entity';
 
 @Controller()
 export class AppController {
@@ -30,25 +43,37 @@ export class AppController {
 
   @Public()
   @Post('/auth/register')
+  @ApiTags('Auth')
+  @ApiOperation({
+    summary: '유저 회원가입',
+    description: '유저의 회원가입 API입니다.',
+  })
+  @ApiBody({ type: RegisterUserDto })
   async register(@Request() req) {
     await this.authService.register(req);
     return Object.assign({ result: 'OK' });
   }
 
   @Public()
-  @UseGuards(LocalAuthGuard)
   @Post('/auth/login')
-  async login(@Request() req) {
-    return this.authService.authLogin(req.user);
-  }
-
-  @Get('/auth/profile')
-  getProfile2(@Request() req) {
-    return this.authService.getProfile(req.user.id);
+  @UseGuards(LocalAuthGuard)
+  @ApiTags('Auth')
+  @ApiOperation({
+    summary: '유저 로그인',
+    description: '유저의 로그인 API입니다.',
+  })
+  async login(@Request() req, @Body() loginDto: LoginDto) {
+    return this.authService.authLogin(loginDto);
   }
 
   @Public()
   @UseGuards(JwtRefreshGuard)
+  @ApiTags('Auth')
+  @ApiBearerAuth('refresh-token')
+  @ApiOperation({
+    summary: 'Refresh Token 이용한 Access Token 발급',
+    description: 'Refresh Token을 이용하여 Access Token을 새로 발급받습니다.',
+  })
   @Get('refresh')
   refresh(@Request() req) {
     return this.authService.makeAccessToken(
@@ -58,6 +83,13 @@ export class AppController {
     );
   }
 
+  @ApiTags('Quiz')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '게임 추천받기',
+    description: '유저 정보를 이용하여 게임 추천을 받습니다.',
+  })
+  @ApiCreatedResponse({ type: GameEntity })
   @Get('/quiz/games')
   async getGames(@Request() req) {
     const userData = await this.userService.getUserData(req.user.id);

@@ -77,6 +77,17 @@ export class QuizService {
     return games;
   }
 
+  async getSelectionList() {
+    const games = await this.gameRepository.find({
+      where: { field: Not('CIST') },
+      order: { gameid: 'ASC' },
+    });
+
+    console.log(games);
+
+    return games;
+  }
+
   async getDICTQuizScore(answer: string) {
     var score = 0;
     var result_array = answer.split(',');

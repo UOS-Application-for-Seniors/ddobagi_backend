@@ -16,7 +16,7 @@ export class QuizEntity {
   @Column()
   quizchoicesdetail: string;
   @Column()
-  quizdatapath: string;
+  difficulty: string;
   @Column()
   quizanswer: string;
   @Column()

@@ -25,6 +25,17 @@ export class FileController {
   }
 
   @Public()
+  @Get(':path1/:name/')
+  async thumbnailDownload(
+    @Res() res: Response,
+    @Param('path1') path1: string,
+    @Param('name') name: string,
+    @Query('fn') fileName,
+  ) {
+    res.download(`src/common/file/quiz/${path1}/${name}`, fileName);
+  }
+
+  @Public()
   @Get(':path1/:path2/:name/')
   async download(
     @Res() res: Response,

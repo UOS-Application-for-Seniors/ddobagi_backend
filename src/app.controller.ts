@@ -31,6 +31,7 @@ import {
 import { RegisterUserDto } from './users/dto/create-register';
 import { LoginDto } from './users/dto/sign-in-dto';
 import { GameEntity } from './quiz/entities/game.entity';
+import { GameDto } from './quiz/dto/game-dto';
 
 @Controller()
 export class AppController {
@@ -89,7 +90,7 @@ export class AppController {
     summary: '게임 추천받기',
     description: '유저 정보를 이용하여 게임 추천을 받습니다.',
   })
-  @ApiCreatedResponse({ type: GameEntity })
+  @ApiCreatedResponse({ type: GameDto })
   @Get('/quiz/games')
   async getGames(@Request() req) {
     const userData = await this.userService.getUserData(req.user.id);

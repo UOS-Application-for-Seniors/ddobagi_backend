@@ -28,6 +28,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { GameDto } from './dto/game-dto';
+import { GameEntity } from './entities/game.entity';
 
 @ApiTags('Quiz')
 @Controller('quiz')
@@ -74,7 +75,17 @@ export class QuizController {
     summary: 'CIST 정보 획득',
     description: 'CIST 퀴즈들의 배열을 Return합니다',
   })
-  @ApiCreatedResponse({ type: GameDto })
+  @ApiCreatedResponse({
+    schema: {
+      properties: {
+        gameid: { type: 'number', example: 30 },
+        gamename: { type: 'string', example: 'CIST1' },
+        usingFragment: { type: 'string', example: 'shortAnswer' },
+        field: { type: 'string', example: 'CIST' },
+        quizid: { type: 'number', example: 6 },
+      },
+    },
+  })
   async getCIST(@Request() req) {
     console.log(req.user);
     return this.quizService.getCIST(req.user.id);

@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  ConsoleLogger,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import { UserDataDto } from 'src/users/dto/user-data-dto';
@@ -11,6 +15,9 @@ import { AnimalEntity } from './entities/animal.entity';
 import { json } from 'stream/consumers';
 import { delay } from 'rxjs';
 import { UsersService } from 'src/users/users.service';
+import { GameDto } from './dto/game-dto';
+import { plainToClass } from 'class-transformer';
+import { Console } from 'console';
 
 @Injectable()
 export class QuizService {
@@ -63,7 +70,21 @@ export class QuizService {
     });
     var shuffled = this.shuffle(games);
 
-    return shuffled;
+    var shuffledDTOArray: Array<GameDto> = [];
+    for (const game of shuffled) {
+      var temp = plainToClass(GameDto, game);
+
+      //이유를 모르겠는데, rowid 0은 찾지 못하는 버그가 있음.            IMPORTANT
+
+      const quiz = await this.quizRepository.findAndCount({
+        where: { game: game },
+      });
+      temp.quizid = Math.floor(Math.random() * quiz[1]);
+      temp.difficulty = quiz[0][temp.quizid].difficulty;
+      shuffledDTOArray.push(temp);
+    }
+
+    return shuffledDTOArray;
   }
 
   async getCIST(userid: string) {

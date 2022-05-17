@@ -33,7 +33,7 @@ export class SmsService {
   }
 
   async sendSMS(number: string, score: number): Promise<void> {
-    /*    ACTUALL CODE
+    // ACTUALL CODE
     const timestamp = Date.now().toString();
     const contentString =
       "[TEST MESSAGE ON DDOBAGI-BACKEND], Your Protege's CIST Score is " +
@@ -71,12 +71,11 @@ export class SmsService {
         console.error(err.response.data);
         throw new InternalServerErrorException();
       });
-      */
 
     // TESTCODE
 
-    console.log(
-      'Phone Number is ' + number + ', CIST SCORE IS ' + score.toString(),
-    );
+    // console.log(
+    //   'Phone Number is ' + number + ', CIST SCORE IS ' + score.toString(),
+    // );
   }
 }

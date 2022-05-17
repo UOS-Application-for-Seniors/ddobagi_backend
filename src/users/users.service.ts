@@ -187,6 +187,13 @@ export class UsersService {
     */
 
     userData.CIST = score + userData.CIST;
+    if (gameid == '54') {
+      var NOK = await this.NOKRepository.findOne({ user: { id: userid } });
+
+      console.log(NOK);
+      this.SMS(NOK.NOKPhoneNumber, userData.CIST);
+    }
+
     await this.usersDataRepository.save(userData);
   }
 

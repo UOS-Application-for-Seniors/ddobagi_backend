@@ -50,7 +50,7 @@ export class RegisterUserDto {
 
   @ApiProperty({
     description: '보호자 휴대전화 번호',
-    example: '010-xxxx-xxxx',
+    example: '010xxxxxxxx',
   })
   @IsOptional()
   @IsString()

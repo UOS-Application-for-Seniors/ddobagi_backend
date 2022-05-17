@@ -78,4 +78,59 @@ export class SmsService {
     //   'Phone Number is ' + number + ', CIST SCORE IS ' + score.toString(),
     // );
   }
+
+  async CISTDangerSMS(
+    name: string,
+    number: string,
+    score: number,
+    standard: number,
+  ) {
+    // ACTUALL CODE
+    const timestamp = Date.now().toString();
+    const contentString =
+      '[Ddobagi]Danger! Your protege is ' +
+      'under DementiaThreat! CISTScore was ' +
+      score.toString() +
+      ' and standard is ' +
+      standard.toString();
+    const body = {
+      type: 'SMS',
+      contentType: 'COMM',
+      countryCode: '82',
+      from: '01033045027', // 발신자 번호
+      content: contentString,
+      messages: [
+        {
+          to: number, // 수신자 번호
+        },
+      ],
+    };
+    const options = {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'x-ncp-iam-access-key': 'VrCjxGsF2m4MDshEdCjQ',
+        'x-ncp-apigw-timestamp': timestamp,
+        'x-ncp-apigw-signature-v2': this.makeSignature(timestamp),
+      },
+    };
+    axios
+      .post(
+        'https://sens.apigw.ntruss.com/sms/v2/services/ncp:sms:kr:284855416355:ddobagi/messages',
+        body,
+        options,
+      )
+      .then(async (res) => {
+        console.log('good');
+      })
+      .catch((err) => {
+        console.error(err.response.data);
+        throw new InternalServerErrorException();
+      });
+
+    // TESTCODE
+
+    // console.log(
+    //   'Phone Number is ' + number + ', CIST SCORE IS ' + score.toString(),
+    // );
+  }
 }

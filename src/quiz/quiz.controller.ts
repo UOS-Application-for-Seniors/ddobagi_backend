@@ -27,6 +27,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { GameDto } from './dto/game-dto';
 
 @ApiTags('Quiz')
 @Controller('quiz')
@@ -73,7 +74,7 @@ export class QuizController {
     summary: 'CIST 정보 획득',
     description: 'CIST 퀴즈들의 배열을 Return합니다',
   })
-  @ApiCreatedResponse({ type: QuizEntity })
+  @ApiCreatedResponse({ type: GameDto })
   async getCIST(@Request() req) {
     console.log(req.user);
     return this.quizService.getCIST(req.user.id);
@@ -100,7 +101,8 @@ export class QuizController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'CIST 점수 추가',
-    description: 'MySQL에 있는 유저 정보에 CIST 점수를 추가합니다',
+    description:
+      'MySQL에 있는 유저 정보에 CIST 점수를 추가합니다. 게임ID가 54일 경우(마지막 문제), 결과를 Return합니다',
   })
   @ApiBody({
     schema: {

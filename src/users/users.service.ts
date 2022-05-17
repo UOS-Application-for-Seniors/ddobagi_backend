@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Connection } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
@@ -189,13 +189,61 @@ export class UsersService {
 
     userData.CIST = score + userData.CIST;
     if (gameid == '54') {
-      var NOK = await this.NOKRepository.findOne({ user: { id: userid } });
+      var NOK = await this.NOKRepository.findOne({ user: user });
+      var scoreStandard = await this.getCISTResult(
+        user.userBirthDate,
+        user.userEducationLevel,
+        userData.CIST,
+      );
 
-      console.log(NOK);
-      this.SMS(NOK.NOKPhoneNumber, userData.CIST);
+      if (scoreStandard != 0) {
+        await this.SMSService.CISTDangerSMS(
+          user.name,
+          NOK.NOKPhoneNumber,
+          userData.CIST,
+          scoreStandard,
+        );
+        console.log('sended');
+      }
     }
 
     await this.usersDataRepository.save(userData);
+  }
+
+  async getCISTResult(
+    userBirthDate: string,
+    userEducationLevel: number,
+    CISTScore: number,
+  ) {
+    const date = new Date();
+    const age =
+      date.getFullYear() - parseInt(userBirthDate.substring(0, 4)) + 1;
+    const dementiaScore = [
+      [0, 0, 21, 23, 25, 26],
+      [0, 15, 20, 22, 24, 25],
+      [12, 13, 18, 21, 21, 24],
+      [9, 10, 15, 17, 19, 21],
+    ];
+    var ageRow = 0;
+    var educationLevelCol = userEducationLevel;
+
+    if (age >= 50 && age < 60) {
+      ageRow = 0;
+    } else if (age >= 60 && age < 70) {
+      ageRow = 1;
+    } else if (age >= 70 && age < 80) {
+      ageRow = 2;
+    } else if (age >= 80) {
+      ageRow = 3;
+    } else {
+      return 0;
+    }
+
+    if (dementiaScore[ageRow][educationLevelCol] > CISTScore) {
+      return dementiaScore[ageRow][educationLevelCol];
+    } else {
+      return 0;
+    }
   }
 
   async saveGameResult(

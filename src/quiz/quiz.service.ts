@@ -95,7 +95,21 @@ export class QuizService {
 
     this.userService.resetCIST(userid);
 
-    return games;
+    var CISTDTOArray: Array<GameDto> = [];
+    for (const game of games) {
+      var temp = plainToClass(GameDto, game);
+
+      //이유를 모르겠는데, rowid 0은 찾지 못하는 버그가 있음.            IMPORTANT
+
+      const quiz = await this.quizRepository.count({
+        where: { game: { gameid: game.gameid } },
+      });
+      temp.quizid = Math.floor(Math.random() * quiz);
+
+      CISTDTOArray.push(temp);
+    }
+
+    return CISTDTOArray;
   }
 
   async getSelectionList() {

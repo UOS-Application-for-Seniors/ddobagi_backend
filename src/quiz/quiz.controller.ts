@@ -24,8 +24,8 @@ export class QuizController {
     private userService: UsersService,
   ) {}
 
-  @Get(':gameid/:quizid')
   @Public()
+  @Get(':gameid/:quizid')
   getQuizInformation(
     @Param('gameid') gameid: number,
     @Param('quizid') quizid: number,
@@ -34,9 +34,15 @@ export class QuizController {
   }
 
   @Public()
+  @Post('/select')
+  async getGameSelectionList() {
+    return this.quizService.getSelectionList();
+  }
+
   @Post()
+  @Public()
   async getRecommendation(dto: UserDataDto) {
-    await this.quizService.getRecommendation(dto);
+    return this.quizService.getRecommendation(dto);
   }
 
   @Get('/CIST')

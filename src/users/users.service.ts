@@ -227,7 +227,7 @@ export class UsersService {
     var ageRow = 0;
     var educationLevelCol = userEducationLevel;
 
-    if (age >= 50 && age < 60) {
+    if (age < 60) {
       ageRow = 0;
     } else if (age >= 60 && age < 70) {
       ageRow = 1;

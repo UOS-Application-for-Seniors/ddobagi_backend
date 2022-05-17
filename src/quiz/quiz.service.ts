@@ -104,7 +104,7 @@ export class QuizService {
       //이유를 모르겠는데, rowid 0은 찾지 못하는 버그가 있음.            IMPORTANT
 
       //CIST 10
-      if ([45, 46, 47, 48, 49].includes(game.gameid)) {
+      if ([36, 45, 46, 47, 48, 49].includes(game.gameid)) {
         temp.quizid = tempID;
         CISTDTOArray.push(temp);
 
@@ -117,7 +117,10 @@ export class QuizService {
         where: { game: game },
       });
       temp.quizid = Math.floor(Math.random() * quiz);
-      tempID = temp.quizid;
+
+      if (game.gameid == 35) {
+        tempID = temp.quizid;
+      }
 
       CISTDTOArray.push(temp);
     }

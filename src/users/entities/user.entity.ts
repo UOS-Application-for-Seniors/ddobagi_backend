@@ -25,6 +25,9 @@ export class UserEntity {
   @Column()
   userRefreshToken: string;
 
+  @Column()
+  totalStars: number;
+
   constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);
   }

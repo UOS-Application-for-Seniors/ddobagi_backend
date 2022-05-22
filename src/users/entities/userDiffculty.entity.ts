@@ -4,42 +4,34 @@ import {
   Column,
   Entity,
   PrimaryColumn,
-  ManyToOne,
-  JoinColumn,
-  OneToOne,
   OneToMany,
-  Index,
-  PrimaryGeneratedColumn,
+  JoinColumn,
+  ManyToMany,
+  ManyToOne,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
+import { UserRecordEntity } from './userRecord.entity';
 
-@Entity('UserRecord')
-export class UserRecordEntity {
-  @PrimaryGeneratedColumn('increment')
-  recordid: number;
-
-  @Column({ type: 'float' })
-  correctPlay: number;
-
-  @Column({ type: 'float' })
-  totalPlay: number;
-
+@Entity('UserDifficulty')
+export class UserDifficultyEntity {
   @Column()
   difficulty: number;
 
   @ManyToOne(() => GameEntity, (GameEntity) => GameEntity.gameid, {
     eager: true,
+    primary: true,
   })
   @JoinColumn({ name: 'gameID' })
   game: GameEntity;
 
   @ManyToOne(() => UserEntity, (UserEntity) => UserEntity.id, {
     eager: true,
+    primary: true,
   })
   @JoinColumn({ name: 'userID' })
   user: UserEntity;
 
-  constructor(partial: Partial<UserRecordEntity>) {
+  constructor(partial: Partial<UserDifficultyEntity>) {
     Object.assign(this, partial);
   }
 }

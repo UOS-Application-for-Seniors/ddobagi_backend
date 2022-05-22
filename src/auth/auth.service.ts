@@ -33,7 +33,7 @@ export class AuthService {
     };
     const tmp_access = this.jwtService.sign(payload, {
       secret: jwtConstants.secret,
-      expiresIn: '600s',
+      expiresIn: '1800s',
     });
     const refresh_token = this.jwtService.sign(payload, {
       secret: 'secret',

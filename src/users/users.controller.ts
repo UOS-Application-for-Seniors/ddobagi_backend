@@ -72,6 +72,7 @@ export class UsersController {
         gameid: { type: 'string' },
         score: { type: 'string' },
         difficulty: { type: 'string' },
+        coin: { type: 'string' },
       },
     },
   })
@@ -81,6 +82,7 @@ export class UsersController {
       body.gameid,
       body.score,
       body.difficulty,
+      body.coin,
     );
   }
 }

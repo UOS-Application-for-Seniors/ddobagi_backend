@@ -1,4 +1,9 @@
-import { ConsoleLogger, Injectable } from '@nestjs/common';
+import {
+  ConsoleLogger,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Connection } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
@@ -13,6 +18,7 @@ import { UserRecordEntity } from './entities/userRecord.entity';
 import { GameEntity } from 'src/quiz/entities/game.entity';
 import { time } from 'console';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserDifficultyEntity } from './entities/userDiffculty.entity';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +31,8 @@ export class UsersService {
     private NOKRepository: Repository<NOKEntity>,
     @InjectRepository(UserRecordEntity)
     private userRecordRepository: Repository<UserRecordEntity>,
+    @InjectRepository(UserDifficultyEntity)
+    private userDiffcultyRepository: Repository<UserDifficultyEntity>,
     @InjectRepository(GameEntity)
     private gameRepository: Repository<GameEntity>,
     private SMSService: SmsService,
@@ -40,6 +48,7 @@ export class UsersService {
       address: user.Address,
       password: user.password,
       userRefreshToken: '',
+      totalStars: 0,
     });
     await this.usersRepository.save(userEntity);
     await this.usersDataRepository.save(
@@ -251,10 +260,12 @@ export class UsersService {
     gameid: string,
     score: string,
     difficulty: string,
+    coin: string,
   ) {
     //difficulty = '0';
     var gameID = parseInt(gameid);
     var difficultyInt = parseInt(difficulty);
+    var coinInt = parseInt(coin);
 
     var game = await this.gameRepository.findOne({ gameid: gameID });
     var user = await this.usersRepository.findOne({ id: userid });
@@ -287,6 +298,7 @@ export class UsersService {
     switch (score) {
       case '0':
         resultEntity.totalPlay = resultEntity.totalPlay + 1;
+
         break;
       case '1':
         resultEntity.correctPlay = resultEntity.correctPlay + 1;
@@ -298,7 +310,10 @@ export class UsersService {
         break;
     }
 
+    user.totalStars += coinInt;
+
     await this.userRecordRepository.save(resultEntity);
+    await this.usersRepository.save(user);
     console.log('saveGameResult Complete');
   }
 
@@ -307,6 +322,53 @@ export class UsersService {
       this.SMSService.sendSMS(number, score);
     } catch (e) {
       console.log(e);
+    }
+  }
+
+  async unlockDifficulty(userid, gameid, difficulty) {
+    console.log(userid);
+    let user = await this.usersRepository.findOne({ id: userid });
+    let game = await this.gameRepository.findOne({ gameid: gameid });
+
+    console.log(user);
+
+    if (difficulty == 1) {
+      if (user.totalStars < 30) {
+        console.log('here');
+        // TODO : Setup Stars
+        throw new HttpException('Not Enough Stars', HttpStatus.NOT_ACCEPTABLE);
+      } else {
+        console.log('here2');
+        let newDif = new UserDifficultyEntity({
+          user: user,
+          game: game,
+          difficulty: 1,
+        });
+        user.totalStars -= 30;
+        await this.userDiffcultyRepository.save(newDif);
+        await this.usersRepository.save(user);
+        return;
+      }
+    }
+
+    if (difficulty == 2) {
+      if (user.totalStars < 50) {
+        // TODO : Setup Stars
+        throw new HttpException('Not Enough Stars', HttpStatus.NOT_ACCEPTABLE);
+      } else {
+        let dif = await this.userDiffcultyRepository.findOne({
+          where: {
+            user: user,
+            game: game,
+          },
+        });
+
+        dif.difficulty = 2;
+        user.totalStars -= 50;
+        await this.userDiffcultyRepository.save(dif);
+        await this.usersRepository.save(user);
+        return;
+      }
     }
   }
 }

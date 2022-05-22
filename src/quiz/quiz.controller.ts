@@ -21,7 +21,9 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiExcludeEndpoint,
+  ApiNotAcceptableResponse,
   ApiOAuth2,
+  ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -63,10 +65,40 @@ export class QuizController {
   }
 
   @Public()
-  @ApiExcludeEndpoint()
-  @Post('/select')
+  @ApiOperation({
+    summary: '선택 게임 정보 불러오기',
+    description: '선택해서 게임하기의 게임 리스트를 반환합니다.',
+  })
+  @ApiResponse({
+    type: GameEntity,
+  })
+  @Get('/select')
   async getGameSelectionList() {
     return this.quizService.getSelectionList();
+  }
+
+  @Post('/unlock')
+  @ApiOperation({
+    summary: '난이도 해금',
+    description: '난이도를 별로 해금할때 필요한 API입니다.',
+  })
+  @ApiBody({
+    schema: {
+      properties: {
+        gameid: { type: 'number', example: 1 },
+        difficulty: { type: 'number', example: 2 },
+      },
+    },
+  })
+  @ApiBearerAuth('access-token')
+  @ApiOkResponse({ description: '정상 반응' })
+  @ApiNotAcceptableResponse({ description: '별이 부족할 때' })
+  async unlockDifficulty(@Request() req, @Body() body) {
+    await this.userService.unlockDifficulty(
+      req.user.id,
+      body.gameid,
+      body.difficulty,
+    );
   }
 
   @Get('/CIST')

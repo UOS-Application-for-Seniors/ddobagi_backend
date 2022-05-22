@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { SmsModule } from 'src/sms/sms.module';
 import { UserRecordEntity } from './entities/userRecord.entity';
 import { GameEntity } from 'src/quiz/entities/game.entity';
+import { UserDifficultyEntity } from './entities/userDiffculty.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { GameEntity } from 'src/quiz/entities/game.entity';
       NOKEntity,
       UserRecordEntity,
       GameEntity,
+      UserDifficultyEntity,
     ]),
     SmsModule,
   ],

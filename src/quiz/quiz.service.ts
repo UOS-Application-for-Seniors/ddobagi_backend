@@ -134,13 +134,15 @@ export class QuizService {
       order: { gameid: 'ASC' },
     });
 
+    let gameArray: Array<GameDto> = [];
     for (let game of games) {
       let gameTmp = plainToClass(GameDto, game);
       gameTmp.openedDifficulty = 0;
+      gameArray.push(gameTmp);
     }
-    console.log(games);
+    console.log(gameArray);
 
-    return games;
+    return gameArray;
   }
 
   async getSelectionListForUser(userid) {
@@ -149,16 +151,18 @@ export class QuizService {
       order: { gameid: 'ASC' },
     });
 
+    let gameArray: Array<GameDto> = [];
     for (let game of games) {
       let gameTmp = plainToClass(GameDto, game);
       gameTmp.openedDifficulty = await this.userService.findMaxDif(
         game.gameid,
         userid,
       );
+      gameArray.push(gameTmp);
     }
-    console.log(games);
+    console.log(gameArray);
 
-    return games;
+    return gameArray;
   }
 
   async getDICTQuizScore(answer: string) {

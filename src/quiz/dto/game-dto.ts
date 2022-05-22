@@ -23,7 +23,7 @@ export class GameDto {
 
   @ApiProperty({ description: '사용 프래그먼트', example: 'multipleChoice' })
   @IsString()
-  readonly usingfragment: string;
+  usingfragment: string;
 
   @ApiProperty({ description: '분류', example: '지남력' })
   @IsString()

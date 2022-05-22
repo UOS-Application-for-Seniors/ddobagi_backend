@@ -138,6 +138,7 @@ export class QuizService {
     for (let game of games) {
       let gameTmp = plainToClass(GameDto, game);
       gameTmp.openedDifficulty = 0;
+      gameTmp.usingfragment = '간략한 설명';
       gameArray.push(gameTmp);
     }
     console.log(gameArray);

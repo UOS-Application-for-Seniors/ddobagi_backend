@@ -134,6 +134,28 @@ export class QuizService {
       order: { gameid: 'ASC' },
     });
 
+    for (let game of games) {
+      let gameTmp = plainToClass(GameDto, game);
+      gameTmp.openedDifficulty = 0;
+    }
+    console.log(games);
+
+    return games;
+  }
+
+  async getSelectionListForUser(userid) {
+    const games = await this.gameRepository.find({
+      where: { field: Not('CIST') },
+      order: { gameid: 'ASC' },
+    });
+
+    for (let game of games) {
+      let gameTmp = plainToClass(GameDto, game);
+      gameTmp.openedDifficulty = await this.userService.findMaxDif(
+        game.gameid,
+        userid,
+      );
+    }
     console.log(games);
 
     return games;

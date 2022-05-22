@@ -38,4 +38,9 @@ export class GameDto {
   @IsOptional()
   @IsString()
   difficulty: string; // for Recommendation
+
+  @ApiProperty({ description: '최대 난이도', example: '2' })
+  @IsOptional()
+  @IsNumber()
+  openedDifficulty: number; // for Recommendation
 }

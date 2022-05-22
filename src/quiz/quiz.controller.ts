@@ -66,15 +66,28 @@ export class QuizController {
 
   @Public()
   @ApiOperation({
-    summary: '선택 게임 정보 불러오기',
+    summary: '비회원용 선택 게임 정보 불러오기',
     description: '선택해서 게임하기의 게임 리스트를 반환합니다.',
   })
   @ApiResponse({
-    type: GameEntity,
+    type: GameDto,
   })
   @Get('/select')
   async getGameSelectionList() {
     return this.quizService.getSelectionList();
+  }
+
+  @ApiOperation({
+    summary: '회원용 선택 게임 정보 불러오기',
+    description: '선택해서 게임하기의 게임 리스트를 반환합니다.',
+  })
+  @ApiResponse({
+    type: GameDto,
+  })
+  @ApiBearerAuth('access-token')
+  @Get('/selectForUser')
+  async getGameSelectionListForUser(@Request() req) {
+    return this.quizService.getSelectionListForUser(req.user.id);
   }
 
   @Post('/unlock')

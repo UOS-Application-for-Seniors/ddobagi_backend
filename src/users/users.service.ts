@@ -371,6 +371,19 @@ export class UsersService {
       }
     }
   }
+
+  async findMaxDif(gameid, userid) {
+    let temp = await this.userDiffcultyRepository.findOne({
+      user: { id: userid },
+      game: { gameid: gameid },
+    });
+
+    if (temp == undefined) {
+      return 0;
+    }
+
+    return temp.difficulty;
+  }
 }
 
 export class ReturnObject {

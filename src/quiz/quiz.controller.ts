@@ -64,6 +64,7 @@ export class QuizController {
     return this.quizService.findQuiz(gameid, quizid);
   }
 
+  @Public()
   @ApiOperation({
     summary: '비회원용 선택 게임 정보 불러오기',
     description: '선택해서 게임하기의 게임 리스트를 반환합니다.',

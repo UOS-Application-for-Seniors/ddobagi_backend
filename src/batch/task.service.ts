@@ -18,7 +18,7 @@ export class TaskService {
     await this.userService.checkDate(date.toJSON().substring(0, 10));
   }
 
-  @Cron('*/60 * * * * *', { name: 'updateData' })
+  @Cron('* */30 * * * *', { name: 'updateData' })
   async updateUserData() {
     this.logger.log('Updated');
     await this.userService.updateUserRecord();

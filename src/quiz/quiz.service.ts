@@ -192,7 +192,7 @@ export class QuizService {
         game.gameid,
         userid,
       );
-      gameTmp.gamedescript = '간략한 설명';
+      gameTmp.gamedescript = game.gamedescript;
       gameArray.push(gameTmp);
     }
     console.log(gameArray);

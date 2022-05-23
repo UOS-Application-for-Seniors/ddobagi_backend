@@ -16,6 +16,12 @@ export class UserDataEntity {
   field4: number;
 
   @Column()
+  field5: number;
+
+  @Column()
+  field6: number;
+
+  @Column()
   CIST: number;
 
   @Column()

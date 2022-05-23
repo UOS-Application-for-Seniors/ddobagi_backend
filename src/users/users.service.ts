@@ -276,9 +276,6 @@ export class UsersService {
     var game = await this.gameRepository.findOne({ gameid: gameID });
     var user = await this.usersRepository.findOne({ id: userid });
 
-    console.log('here');
-    console.log(game);
-
     var resultEntity = await this.userRecordRepository.findOne({
       where: {
         game: { gameid: gameid },
@@ -286,8 +283,6 @@ export class UsersService {
         difficulty: difficultyInt,
       },
     });
-
-    console.log('here2');
 
     if (resultEntity == undefined) {
       var resultEntity = new UserRecordEntity({
@@ -300,6 +295,8 @@ export class UsersService {
 
       await this.userRecordRepository.create(resultEntity);
     }
+
+    // Score에 따라서 ResultRecord 계산
 
     switch (score) {
       case '0':
@@ -318,6 +315,42 @@ export class UsersService {
 
     user.totalStars += coinInt;
 
+    let gameField = await this.gameRepository.find({ field: game.field });
+    let totalPlay = 0;
+    let correctPlay = 0;
+    for (let games of gameField) {
+      let userRecord = await this.userRecordRepository.find({
+        where: { user: user, game: games },
+      });
+      for (let record of userRecord) {
+        correctPlay += record.correctPlay;
+        totalPlay += record.totalPlay;
+      }
+    }
+
+    let userData = await this.usersDataRepository.findOne({ user: user });
+    switch (game.field) {
+      case '지남력':
+        userData.field1 = correctPlay / totalPlay;
+        break;
+      case '시공간기능':
+        userData.field2 = correctPlay / totalPlay;
+        break;
+      case '주의집중력':
+        userData.field3 = correctPlay / totalPlay;
+        break;
+      case '기억력':
+        userData.field4 = correctPlay / totalPlay;
+        break;
+      case '실행기능':
+        userData.field5 = correctPlay / totalPlay;
+        break;
+      case '언어기능':
+        userData.field6 = correctPlay / totalPlay;
+        break;
+    }
+
+    await this.usersDataRepository.save(userData);
     await this.userRecordRepository.save(resultEntity);
     await this.usersRepository.save(user);
     console.log('saveGameResult Complete');
@@ -381,7 +414,6 @@ export class UsersService {
   }
 
   async updateUser(userid: string, updateData: UpdateUserDto) {
-    let nokDTO = new NOKDTO();
     const {
       NOKID,
       NOKName,

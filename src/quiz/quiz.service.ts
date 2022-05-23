@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import { UserDataDto } from 'src/users/dto/user-data-dto';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { Entity, Not, Repository } from 'typeorm';
+import { Entity, Like, Not, Repository } from 'typeorm';
 import { GameEntity } from './entities/game.entity';
 import { QuizEntity } from './entities/quiz.entity';
 // import * as dictJSON from '../966314_8026.json';
@@ -126,7 +126,7 @@ export class QuizService {
 
   async getCIST(userid: string) {
     const games = await this.gameRepository.find({
-      where: { field: 'CIST' },
+      where: { gamename: Like(`%${'CIST'}%`) },
       order: { gameid: 'ASC' },
     });
 

@@ -47,10 +47,11 @@ export class AuthService {
       refresh_token: refresh_token,
       refresh_token_expiration: '600000000',
       user_address: await this.usersService.getAddress(logindto.username),
+      coin: await this.usersService.getCoin(logindto.username),
     };
   }
 
-  makeAccessToken(userid: string, email: string, name: string) {
+  async makeAccessToken(userid: string, email: string, name: string) {
     const payload = { username: userid, email: email, name: name };
     const tmp_access = this.jwtService.sign(payload, {
       secret: jwtConstants.secret,
@@ -60,15 +61,17 @@ export class AuthService {
     return {
       access_token: tmp_access,
       access_token_expiration: '600000',
+      user_address: await this.usersService.getAddress(userid),
+      coin: await this.usersService.getCoin(userid),
     };
   }
 
   async register(user: any): Promise<void> {
-    const payload = await this.usersService.checkExist(user.body.id);
+    const payload = await this.usersService.checkExist(user.id);
     if (payload) {
       throw new HttpException('Duplicated UserID', HttpStatus.BAD_REQUEST);
     } else {
-      await this.usersService.saveUser(user.body);
+      await this.usersService.saveUser(user);
     }
   }
 

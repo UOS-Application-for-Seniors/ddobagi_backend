@@ -50,7 +50,7 @@ export class AppController {
     description: '유저의 회원가입 API입니다.',
   })
   @ApiBody({ type: RegisterUserDto })
-  async register(@Request() req) {
+  async register(@Body() req: RegisterUserDto) {
     await this.authService.register(req);
     return Object.assign({ result: 'OK' });
   }

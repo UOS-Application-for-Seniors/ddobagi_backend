@@ -90,6 +90,24 @@ export class QuizController {
     return this.quizService.getSelectionListForUser(req.user.id);
   }
 
+  @Public()
+  @Post('/selectGame')
+  @ApiOperation({
+    summary: '게임 선택시 퀴즈 받기',
+    description: '난이도에 해당하는 퀴즈 리스트를 return 받습니다.',
+  })
+  @ApiBody({
+    schema: {
+      properties: {
+        gameID: { type: 'string', example: '1' },
+        difficulty: { type: 'string', example: '1' },
+      },
+    },
+  })
+  async returnQuizList(@Body() body) {
+    return this.quizService.returnQuizList(body.gameID, body.difficulty);
+  }
+
   @Post('/unlock')
   @ApiOperation({
     summary: '난이도 해금',
@@ -98,8 +116,8 @@ export class QuizController {
   @ApiBody({
     schema: {
       properties: {
-        gameid: { type: 'number', example: 1 },
-        difficulty: { type: 'number', example: 2 },
+        gameID: { type: 'string', example: '1' },
+        difficulty: { type: 'string', example: '2' },
       },
     },
   })
@@ -109,7 +127,7 @@ export class QuizController {
   async unlockDifficulty(@Request() req, @Body() body) {
     await this.userService.unlockDifficulty(
       req.user.id,
-      body.gameid,
+      body.gameID,
       body.difficulty,
     );
   }

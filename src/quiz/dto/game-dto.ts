@@ -15,11 +15,11 @@ export class GameDto {
   @ApiProperty({ description: '게임ID', example: '9' })
   @Type(() => Number)
   @IsNumber()
-  readonly gameid: number;
+  gameid: number;
 
   @ApiProperty({ description: '게임이름', example: '야채' })
   @IsString()
-  readonly gamename: string;
+  gamename: string;
 
   @ApiProperty({ description: '사용 프래그먼트', example: 'multipleChoice' })
   @IsString()
@@ -27,7 +27,7 @@ export class GameDto {
 
   @ApiProperty({ description: '분류', example: '지남력' })
   @IsString()
-  readonly field: string;
+  field: string;
 
   @ApiProperty({ description: '퀴즈ID', example: '5' })
   @IsOptional()
@@ -39,8 +39,12 @@ export class GameDto {
   @IsString()
   difficulty: string; // for Recommendation
 
+  @ApiProperty({ description: '게임 설명', example: '간략한 게임 설명' })
+  @IsOptional()
+  gamedescript: string; // for GameList
+
   @ApiProperty({ description: '최대 난이도', example: '2' })
   @IsOptional()
   @IsNumber()
-  openedDifficulty: number; // for Recommendation
+  openedDifficulty: number; // for GameList
 }

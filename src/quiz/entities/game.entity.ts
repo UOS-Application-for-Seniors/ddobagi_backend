@@ -22,6 +22,13 @@ export class GameEntity {
   @Column()
   usingfragment: string;
 
+  @ApiProperty({
+    description: '간략한 설명',
+    example: '야채가 아닌것을 고르는 게임',
+  })
+  @Column()
+  gamedescript: string;
+
   @ApiProperty({ description: '분류', example: '인지력' })
   @Column()
   field: string;

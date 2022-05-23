@@ -24,6 +24,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { UpdateUserDto } from './dto/update-user-dto';
 
 @Controller('users')
 @ApiTags('User API')
@@ -69,7 +70,7 @@ export class UsersController {
   @ApiBody({
     schema: {
       properties: {
-        gameid: { type: 'string' },
+        gameID: { type: 'string' },
         score: { type: 'string' },
         difficulty: { type: 'string' },
         coin: { type: 'string' },
@@ -79,10 +80,21 @@ export class UsersController {
   saveGameResult(@Request() req, @Body() body) {
     return this.usersService.saveGameResult(
       req.user.id,
-      body.gameid,
+      body.gameID,
       body.score,
       body.difficulty,
       body.coin,
     );
+  }
+
+  @Post('update')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '유저 정보 업데이트',
+    description: '유저의 정보를 업데이트합니다',
+  })
+  @ApiBody({ type: UpdateUserDto })
+  updateUserData(@Request() req, @Body() updateUser: UpdateUserDto) {
+    return this.usersService.updateUser(req.user.id, updateUser);
   }
 }

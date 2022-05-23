@@ -19,6 +19,8 @@ import { GameEntity } from 'src/quiz/entities/game.entity';
 import { time } from 'console';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserDifficultyEntity } from './entities/userDiffculty.entity';
+import { UpdateUserDto } from './dto/update-user-dto';
+import { NOKDTO } from './dto/NOK-dto';
 
 @Injectable()
 export class UsersService {
@@ -39,13 +41,16 @@ export class UsersService {
     private connection: Connection,
   ) {}
 
+  private readonly DIFFICULTY_COST_NORMAL = 5000;
+  private readonly DIFFICULTY_COST_HARD = 10000;
+
   async saveUser(user: RegisterUserDto) {
     const userEntity = new UserEntity({
       id: user.id,
       name: user.name,
       userBirthDate: user.userBirthDate,
       userEducationLevel: user.userEducationLevel,
-      address: user.Address,
+      address: user.address,
       password: user.password,
       userRefreshToken: '',
       totalStars: 0,
@@ -58,6 +63,7 @@ export class UsersService {
         field3: 0,
         field4: 0,
         CIST: 0,
+        PastCIST: 0,
         user: userEntity,
       }),
     );
@@ -325,15 +331,17 @@ export class UsersService {
     }
   }
 
-  async unlockDifficulty(userid, gameid, difficulty) {
+  async unlockDifficulty(userid, gameidString, difficultyString) {
     console.log(userid);
+    let gameid = parseInt(gameidString);
+    let difficulty = parseInt(difficultyString);
     let user = await this.usersRepository.findOne({ id: userid });
     let game = await this.gameRepository.findOne({ gameid: gameid });
 
     console.log(user);
 
     if (difficulty == 1) {
-      if (user.totalStars < 30) {
+      if (user.totalStars < this.DIFFICULTY_COST_NORMAL) {
         console.log('here');
         // TODO : Setup Stars
         throw new HttpException('Not Enough Stars', HttpStatus.NOT_ACCEPTABLE);
@@ -344,7 +352,7 @@ export class UsersService {
           game: game,
           difficulty: 1,
         });
-        user.totalStars -= 30;
+        user.totalStars -= this.DIFFICULTY_COST_NORMAL;
         await this.userDiffcultyRepository.save(newDif);
         await this.usersRepository.save(user);
         return;
@@ -352,7 +360,7 @@ export class UsersService {
     }
 
     if (difficulty == 2) {
-      if (user.totalStars < 50) {
+      if (user.totalStars < this.DIFFICULTY_COST_HARD) {
         // TODO : Setup Stars
         throw new HttpException('Not Enough Stars', HttpStatus.NOT_ACCEPTABLE);
       } else {
@@ -364,12 +372,34 @@ export class UsersService {
         });
 
         dif.difficulty = 2;
-        user.totalStars -= 50;
+        user.totalStars -= this.DIFFICULTY_COST_HARD;
         await this.userDiffcultyRepository.save(dif);
         await this.usersRepository.save(user);
         return;
       }
     }
+  }
+
+  async updateUser(userid: string, updateData: UpdateUserDto) {
+    let nokDTO = new NOKDTO();
+    const {
+      NOKID,
+      NOKName,
+      NOKNotificationDays,
+      NOKPhoneNumber,
+      ...userDataUpdate
+    } = updateData;
+    const {
+      id,
+      address,
+      userBirthDate,
+      userEducationLevel,
+      password,
+      name,
+      ...NOKDataUpdate
+    } = updateData;
+    await this.usersRepository.update(userid, userDataUpdate);
+    await this.NOKRepository.update({ user: { id: userid } }, NOKDataUpdate);
   }
 
   async findMaxDif(gameid, userid) {
@@ -383,6 +413,12 @@ export class UsersService {
     }
 
     return temp.difficulty;
+  }
+
+  async getCoin(userid) {
+    let temp = await this.usersRepository.findOne({ id: userid });
+
+    return temp.totalStars;
   }
 }
 

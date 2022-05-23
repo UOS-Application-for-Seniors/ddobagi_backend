@@ -1,5 +1,7 @@
 import {
   ConsoleLogger,
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -87,6 +89,41 @@ export class QuizService {
     return shuffledDTOArray;
   }
 
+  async returnQuizList(gameid: string, difficulty: string) {
+    const gameID = parseInt(gameid);
+    const difficultyInt = parseInt(difficulty);
+    const game = await this.gameRepository.findOne({ gameid: gameID });
+
+    console.log(gameID);
+    console.log(difficultyInt);
+
+    let quizListArray: Array<GameDto> = [];
+    let quiz = await this.quizRepository.findAndCount({
+      where: { game: { gameid: gameID }, difficulty: difficultyInt },
+    });
+
+    console.log(quiz);
+    if (quiz[1] < 3) {
+      throw new HttpException('Not Enough Quiz!', HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    let randomArray = this.randomIndexArray(quiz[1]);
+
+    for (let randomValue of randomArray) {
+      let temp = plainToClass(GameDto, quiz[0][randomValue]);
+      temp.gameid = game.gameid;
+      temp.field = game.field;
+      temp.gamename = game.gamename;
+      temp.gamedescript = game.gamedescript;
+      temp.usingfragment = game.usingfragment;
+
+      quizListArray.push(temp);
+    }
+
+    console.log(quizListArray);
+    return quizListArray;
+  }
+
   async getCIST(userid: string) {
     const games = await this.gameRepository.find({
       where: { field: 'CIST' },
@@ -99,7 +136,6 @@ export class QuizService {
     var CISTDTOArray: Array<GameDto> = [];
     for (const game of games) {
       var temp = plainToClass(GameDto, game);
-      console.log(game.gameid);
 
       //이유를 모르겠는데, rowid 0은 찾지 못하는 버그가 있음.            IMPORTANT
 
@@ -107,9 +143,6 @@ export class QuizService {
       if ([36, 44, 45, 46, 47, 48, 49].includes(game.gameid)) {
         temp.quizid = tempID;
         CISTDTOArray.push(temp);
-
-        console.log('true');
-
         continue;
       }
 
@@ -138,7 +171,7 @@ export class QuizService {
     for (let game of games) {
       let gameTmp = plainToClass(GameDto, game);
       gameTmp.openedDifficulty = 0;
-      gameTmp.usingfragment = '간략한 설명';
+      gameTmp.gamedescript = '간략한 설명';
       gameArray.push(gameTmp);
     }
     console.log(gameArray);
@@ -159,6 +192,7 @@ export class QuizService {
         game.gameid,
         userid,
       );
+      gameTmp.gamedescript = '간략한 설명';
       gameArray.push(gameTmp);
     }
     console.log(gameArray);
@@ -255,5 +289,21 @@ export class QuizService {
     }
 
     return array;
+  }
+
+  randomIndexArray(number: number) {
+    //중복을 제외하고 3개의 랜덤 숫자 뽑기
+    let randomIndexArray = [];
+
+    for (let i = 0; i < 3; i++) {
+      let randomNum = Math.floor(Math.random() * number);
+      if (randomIndexArray.indexOf(randomNum) === -1) {
+        randomIndexArray.push(randomNum);
+      } else {
+        i--;
+      }
+    }
+
+    return randomIndexArray;
   }
 }

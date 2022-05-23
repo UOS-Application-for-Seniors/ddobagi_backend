@@ -315,42 +315,6 @@ export class UsersService {
 
     user.totalStars += coinInt;
 
-    let gameField = await this.gameRepository.find({ field: game.field });
-    let totalPlay = 0;
-    let correctPlay = 0;
-    for (let games of gameField) {
-      let userRecord = await this.userRecordRepository.find({
-        where: { user: user, game: games },
-      });
-      for (let record of userRecord) {
-        correctPlay += record.correctPlay;
-        totalPlay += record.totalPlay;
-      }
-    }
-
-    let userData = await this.usersDataRepository.findOne({ user: user });
-    switch (game.field) {
-      case '지남력':
-        userData.field1 = correctPlay / totalPlay;
-        break;
-      case '시공간기능':
-        userData.field2 = correctPlay / totalPlay;
-        break;
-      case '주의집중력':
-        userData.field3 = correctPlay / totalPlay;
-        break;
-      case '기억력':
-        userData.field4 = correctPlay / totalPlay;
-        break;
-      case '실행기능':
-        userData.field5 = correctPlay / totalPlay;
-        break;
-      case '언어기능':
-        userData.field6 = correctPlay / totalPlay;
-        break;
-    }
-
-    await this.usersDataRepository.save(userData);
     await this.userRecordRepository.save(resultEntity);
     await this.usersRepository.save(user);
     console.log('saveGameResult Complete');
@@ -451,6 +415,67 @@ export class UsersService {
     let temp = await this.usersRepository.findOne({ id: userid });
 
     return temp.totalStars;
+  }
+
+  async updateUserRecord() {
+    const gameField = [
+      '지남력',
+      '시공간기능',
+      '주의집중력',
+      '기억력',
+      '실행기능',
+      '언어기능',
+    ];
+    const users = await this.usersRepository.find();
+    for (const user of users) {
+      for (const field of gameField) {
+        let totalPlay = 0;
+        let correctPlay = 0;
+        let games = await this.gameRepository.find({ field: field });
+        for (const game of games) {
+          let userRecord = await this.userRecordRepository.find({
+            where: { user: user, game: game },
+          });
+          for (let record of userRecord) {
+            correctPlay += record.correctPlay;
+            totalPlay += record.totalPlay;
+          }
+        }
+
+        let userData = await this.usersDataRepository.findOne({
+          user: user,
+        });
+        let successRate;
+        if (totalPlay == 0) {
+          successRate = 0;
+        } else {
+          successRate = correctPlay / totalPlay;
+        }
+
+        switch (field) {
+          case '지남력':
+            userData.field1 = successRate;
+            break;
+          case '시공간기능':
+            userData.field2 = successRate;
+            break;
+          case '주의집중력':
+            userData.field3 = successRate;
+            break;
+          case '기억력':
+            userData.field4 = successRate;
+            break;
+          case '실행기능':
+            userData.field5 = successRate;
+            break;
+          case '언어기능':
+            userData.field6 = successRate;
+            break;
+        }
+
+        await this.usersDataRepository.save(userData);
+      }
+    }
   }
 }
 

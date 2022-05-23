@@ -17,4 +17,10 @@ export class TaskService {
     // this.logger.log(date.toJSON().substring(0, 10)); expected output "2022-05-03"
     await this.userService.checkDate(date.toJSON().substring(0, 10));
   }
+
+  @Cron('*/60 * * * * *', { name: 'updateData' })
+  async updateUserData() {
+    this.logger.log('Updated');
+    await this.userService.updateUserRecord();
+  }
 }

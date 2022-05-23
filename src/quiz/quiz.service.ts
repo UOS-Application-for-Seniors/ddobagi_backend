@@ -66,10 +66,16 @@ export class QuizService {
     /* TODO MAKE RECOMMENDATION ALGORITHM
     return Array;
     */
-    const games = await this.gameRepository.find({
-      where: { field: Not('CIST') },
-      order: { gameid: 'ASC' },
-    });
+
+    const table = this.makeTable(data);
+    const game1 = await this.makeGameTable('지남력', table[0]);
+    const game2 = await this.makeGameTable('시공간기능', table[1]);
+    const game3 = await this.makeGameTable('주의집중력', table[2]);
+    const game4 = await this.makeGameTable('기억력', table[3]);
+    const game5 = await this.makeGameTable('실행기능', table[4]);
+    const game6 = await this.makeGameTable('언어기능', table[5]);
+    let games = game1.concat(game2, game3, game4, game5, game6);
+    console.log(games);
     var shuffled = this.shuffle(games);
 
     var shuffledDTOArray: Array<GameDto> = [];
@@ -107,7 +113,7 @@ export class QuizService {
       throw new HttpException('Not Enough Quiz!', HttpStatus.NOT_ACCEPTABLE);
     }
 
-    let randomArray = this.randomIndexArray(quiz[1]);
+    let randomArray = this.randomIndexArray(quiz[1], 3);
 
     for (let randomValue of randomArray) {
       let temp = plainToClass(GameDto, quiz[0][randomValue]);
@@ -216,6 +222,27 @@ export class QuizService {
     };
   }
 
+  async makeGameTable(field: string, count: number) {
+    const gameTable: Array<GameEntity> = [];
+    console.log(field);
+    console.log(count);
+
+    let game = await this.gameRepository.findAndCount({ field: field });
+    let index = this.randomIndexArray(game[1], count);
+
+    console.log(game);
+
+    if (index.length > 1) {
+      for (let number of index) {
+        gameTable.push(game[0][number]);
+      }
+    }
+
+    console.log(gameTable);
+
+    return gameTable;
+  }
+
   /*
   async getDICT2() {
     var word = dictJSON.channel.item;
@@ -291,11 +318,15 @@ export class QuizService {
     return array;
   }
 
-  randomIndexArray(number: number) {
+  randomIndexArray(number: number, many: number) {
     //중복을 제외하고 3개의 랜덤 숫자 뽑기
     let randomIndexArray = [];
 
-    for (let i = 0; i < 3; i++) {
+    if (number < many) {
+      return [];
+    }
+
+    for (let i = 0; i < many; i++) {
       let randomNum = Math.floor(Math.random() * number);
       if (randomIndexArray.indexOf(randomNum) === -1) {
         randomIndexArray.push(randomNum);
@@ -305,5 +336,31 @@ export class QuizService {
     }
 
     return randomIndexArray;
+  }
+
+  makeTable(data: UserDataDto) {
+    let field1Score = 100 - Math.floor(data.field1 * 100);
+    let field2Score = 100 - Math.floor(data.field2 * 100);
+    let field3Score = 100 - Math.floor(data.field3 * 100);
+    let field4Score = 100 - Math.floor(data.field4 * 100);
+    let field5Score = 100 - Math.floor(data.field5 * 100);
+    let field6Score = 100 - Math.floor(data.field6 * 100);
+    let total =
+      field1Score +
+      field2Score +
+      field3Score +
+      field4Score +
+      field5Score +
+      field6Score;
+
+    let scoreTable: Array<number> = [];
+    scoreTable.push(Math.round((10 * field1Score) / total));
+    scoreTable.push(Math.round((10 * field2Score) / total));
+    scoreTable.push(Math.round((10 * field3Score) / total));
+    scoreTable.push(Math.round((10 * field4Score) / total));
+    scoreTable.push(Math.round((10 * field5Score) / total));
+    scoreTable.push(Math.round((10 * field6Score) / total));
+
+    return scoreTable;
   }
 }

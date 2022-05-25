@@ -21,6 +21,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserDifficultyEntity } from './entities/userDiffculty.entity';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { NOKDTO } from './dto/NOK-dto';
+import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class UsersService {
@@ -394,8 +395,12 @@ export class UsersService {
       name,
       ...NOKDataUpdate
     } = updateData;
-    await this.usersRepository.update(userid, userDataUpdate);
-    await this.NOKRepository.update({ user: { id: userid } }, NOKDataUpdate);
+    if (Object.keys(NOKDataUpdate).length != 0) {
+      await this.usersRepository.update(userid, userDataUpdate);
+    }
+    if (Object.keys(NOKDataUpdate).length != 0) {
+      await this.NOKRepository.update({ user: { id: userid } }, NOKDataUpdate);
+    }
   }
 
   async findMaxDif(gameid, userid) {

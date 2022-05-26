@@ -68,6 +68,7 @@ export class QuizService {
     */
 
     const table = this.makeTable(data);
+    console.log(table);
     const game1 = await this.makeGameTable('지남력', table[0]);
     const game2 = await this.makeGameTable('시공간기능', table[1]);
     const game3 = await this.makeGameTable('주의집중력', table[2]);
@@ -227,12 +228,17 @@ export class QuizService {
     console.log(field);
     console.log(count);
 
-    let game = await this.gameRepository.findAndCount({ field: field });
+    let game = await this.gameRepository.findAndCount({
+      where: {
+        field: field,
+        gamename: Not(Like(`${'CIST10'}%`)) && Not(Like(`${'CIST3'}%`)),
+      },
+    });
     let index = this.randomIndexArray(game[1], count);
 
     console.log(game);
 
-    if (index.length > 1) {
+    if (index.length >= 1) {
       for (let number of index) {
         gameTable.push(game[0][number]);
       }

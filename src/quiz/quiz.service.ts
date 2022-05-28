@@ -187,10 +187,27 @@ export class QuizService {
   }
 
   async getSelectionListForUser(userid) {
-    const games = await this.gameRepository.find({
-      where: { field: Not('CIST') },
-      order: { gameid: 'ASC' },
-    });
+    const data = await this.userService.getUserData(userid);
+
+    let games: Array<GameEntity> = [];
+    let dataArray: Array<[string, number]> = [];
+
+    dataArray.push(['지남력', data.field1]);
+    dataArray.push(['시공간기능', data.field2]);
+    dataArray.push(['주의집중력', data.field3]);
+    dataArray.push(['기억력', data.field4]);
+    dataArray.push(['실행기능', data.field5]);
+    dataArray.push(['언어기능', data.field6]);
+
+    dataArray.sort((a, b) => b[1] - a[1]);
+
+    for (let field of dataArray) {
+      const game = await this.gameRepository.find({
+        where: { field: field[0] },
+        order: { gameid: 'ASC' },
+      });
+      games = games.concat(game);
+    }
 
     let gameArray: Array<GameDto> = [];
     for (let game of games) {
@@ -202,7 +219,6 @@ export class QuizService {
       gameTmp.gamedescript = game.gamedescript;
       gameArray.push(gameTmp);
     }
-    console.log(gameArray);
 
     return gameArray;
   }

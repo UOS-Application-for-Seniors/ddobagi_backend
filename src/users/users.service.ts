@@ -422,6 +422,12 @@ export class UsersService {
     return temp.totalStars;
   }
 
+  async getData(userid) {
+    let temp = await this.usersDataRepository.findOne({ user: { id: userid } });
+
+    return temp;
+  }
+
   async updateUserRecord() {
     const gameField = [
       '지남력',

@@ -22,6 +22,10 @@ export class QuizEntity {
   @Column()
   quizchoicesdetail: string;
 
+  @ApiProperty({ description: '퀴즈 문제 그림파일 이름' })
+  @Column()
+  quizchoicespicture: string;
+
   @ApiProperty({ description: '퀴즈 난이도' })
   @Column()
   difficulty: string;

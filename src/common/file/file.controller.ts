@@ -46,6 +46,6 @@ export class FileController {
     @Param('name') name: string,
     @Query('fn') fileName,
   ) {
-    res.download(`src/common/file/quiz/${path1}/${path2}/${name}`, fileName);
+    res.download(`src/common/file/${path1}/${path2}/${name}`, fileName);
   }
 }

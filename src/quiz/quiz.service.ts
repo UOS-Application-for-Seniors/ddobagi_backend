@@ -297,10 +297,10 @@ export class QuizService {
   dayToString(day: number) {
     switch (day) {
       case 1:
-        return '월요일';
+        return '월요일,월오일,월여일,워요일,월료일';
         break;
       case 2:
-        return '화요일';
+        return '화요일,하요일,화외일,화여일';
         break;
       case 3:
         return '수요일';
@@ -312,10 +312,10 @@ export class QuizService {
         return '금요일';
         break;
       case 6:
-        return '토요일';
+        return '토요일,반공일';
         break;
       case 0:
-        return '일요일';
+        return '일요일,온공일';
         break;
       default:
         return 'error';

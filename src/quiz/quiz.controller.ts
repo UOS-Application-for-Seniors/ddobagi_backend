@@ -172,7 +172,7 @@ export class QuizController {
     return this.quizService.getDICTQuizScore(req.result);
   }
 
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'CIST 점수 추가',
     description:

@@ -204,6 +204,7 @@ export class UsersService {
     */
 
     userData.CIST = score + userData.CIST;
+    await this.usersDataRepository.save(userData);
     if (gameid == '54') {
       var NOK = await this.NOKRepository.findOne({ user: user });
       var scoreStandard = await this.getCISTResult(
@@ -220,10 +221,11 @@ export class UsersService {
           scoreStandard,
         );
         console.log('sended');
+        return { isDemensia: true };
       }
-    }
 
-    await this.usersDataRepository.save(userData);
+      return { isDemensia: false };
+    }
   }
 
   async getCISTResult(
@@ -422,11 +424,11 @@ export class UsersService {
     return temp.totalStars;
   }
 
-  async getData(userid) {
-    let temp = await this.usersDataRepository.findOne({ user: { id: userid } });
+  // async getData(userid) {
+  //   let temp = await this.usersDataRepository.findOne({ user: { id: userid } });
 
-    return temp;
-  }
+  //   return temp;
+  // }
 
   async updateUserRecord() {
     const gameField = [

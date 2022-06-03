@@ -397,7 +397,8 @@ export class UsersService {
       name,
       ...NOKDataUpdate
     } = updateData;
-    if (Object.keys(NOKDataUpdate).length != 0) {
+    if (Object.keys(userDataUpdate).length != 0) {
+      console.log(userDataUpdate);
       await this.usersRepository.update(userid, userDataUpdate);
     }
     if (Object.keys(NOKDataUpdate).length != 0) {

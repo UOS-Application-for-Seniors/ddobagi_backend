@@ -137,7 +137,7 @@ export class QuizService {
       order: { gameid: 'ASC' },
     });
 
-    this.userService.resetCIST(userid);
+    await this.userService.resetCIST(userid);
 
     var tempID = 0;
     var CISTDTOArray: Array<GameDto> = [];
@@ -244,12 +244,12 @@ export class QuizService {
     console.log(field);
     console.log(count);
 
-    let game = await this.gameRepository.findAndCount({
-      where: {
-        field: field,
-        gamename: Not(Like(`${'CIST10'}%`)) && Not(Like(`${'CIST3'}%`)),
-      },
-    });
+    let game = await this.gameRepository
+      .createQueryBuilder('game')
+      .where('game.field = :field', { field: field })
+      .andWhere('game.gamename not like :game1', { game1: `${'CIST10'}%` })
+      .andWhere('game.gamename not like :game2', { game2: `${'CIST3'}%` })
+      .getManyAndCount();
     let index = this.randomIndexArray(game[1], count);
 
     console.log(game);

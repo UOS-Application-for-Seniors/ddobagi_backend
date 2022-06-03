@@ -169,10 +169,11 @@ export class QuizService {
   }
 
   async getSelectionList() {
-    const games = await this.gameRepository.find({
-      where: { field: Not('CIST') },
-      order: { gameid: 'ASC' },
-    });
+    let games = await this.gameRepository
+      .createQueryBuilder('game')
+      .andWhere('game.gamename not like :game1', { game1: `${'CIST10'}%` })
+      .andWhere('game.gamename not like :game2', { game2: `${'CIST3'}%` })
+      .getMany();
 
     let gameArray: Array<GameDto> = [];
     for (let game of games) {
@@ -202,10 +203,12 @@ export class QuizService {
     dataArray.sort((a, b) => b[1] - a[1]);
 
     for (let field of dataArray) {
-      const game = await this.gameRepository.find({
-        where: { field: field[0] },
-        order: { gameid: 'ASC' },
-      });
+      let game = await this.gameRepository
+        .createQueryBuilder('game')
+        .where('game.field = :field', { field: field[0] })
+        .andWhere('game.gamename not like :game1', { game1: `${'CIST10'}%` })
+        .andWhere('game.gamename not like :game2', { game2: `${'CIST3'}%` })
+        .getMany();
       games = games.concat(game);
     }
 

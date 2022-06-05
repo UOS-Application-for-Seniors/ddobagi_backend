@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Connection } from 'typeorm';
@@ -44,6 +45,8 @@ export class UsersService {
 
   private readonly DIFFICULTY_COST_NORMAL = 5000;
   private readonly DIFFICULTY_COST_HARD = 10000;
+
+  private logger = new Logger();
 
   async saveUser(user: RegisterUserDto) {
     const userEntity = new UserEntity({
@@ -153,6 +156,16 @@ export class UsersService {
     let data = await this.usersRepository.findOne({ id: userid });
     data.userRefreshToken = token;
     await this.usersRepository.save(data);
+  }
+
+  async addCoin(userid: string, coin: string) {
+    let data = await this.usersRepository.findOne({ id: userid });
+    let coinInt = parseInt(coin);
+
+    data.totalStars = data.totalStars + coinInt;
+
+    await this.usersRepository.save(data);
+    this.logger.log('Added ' + userid + "'s Coin : " + coin);
   }
 
   async checkDate(date: string) {

@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  Req,
 } from '@nestjs/common';
 import { ReturnObject, UsersService } from './users.service';
 import { UserEntity } from './entities/user.entity';
@@ -96,5 +97,22 @@ export class UsersController {
   @ApiBody({ type: UpdateUserDto })
   updateUserData(@Request() req, @Body() updateUser: UpdateUserDto) {
     return this.usersService.updateUser(req.user.id, updateUser);
+  }
+
+  @Post('userAddCoin')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '유저 코인 추가',
+    description: '유저의 코인을 추가합니다',
+  })
+  @ApiBody({
+    schema: {
+      properties: {
+        coin: { type: 'string' },
+      },
+    },
+  })
+  async userAddCoin(@Request() req, @Body() coin) {
+    await this.usersService.addCoin(req.user.id, coin);
   }
 }

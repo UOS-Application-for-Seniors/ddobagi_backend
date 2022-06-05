@@ -1,1 +1,1 @@
-ren *.png *.jfif
+ren *.jpg *.jfif

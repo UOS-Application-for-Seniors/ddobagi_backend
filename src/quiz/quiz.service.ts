@@ -171,8 +171,7 @@ export class QuizService {
   async getSelectionList() {
     let games = await this.gameRepository
       .createQueryBuilder('game')
-      .andWhere('game.gamename not like :game1', { game1: `${'CIST10'}%` })
-      .andWhere('game.gamename not like :game2', { game2: `${'CIST3'}%` })
+      .andWhere('game.gamename not like :game1', { game1: `${'CIST'}%` })
       .getMany();
 
     let gameArray: Array<GameDto> = [];
@@ -206,8 +205,7 @@ export class QuizService {
       let game = await this.gameRepository
         .createQueryBuilder('game')
         .where('game.field = :field', { field: field[0] })
-        .andWhere('game.gamename not like :game1', { game1: `${'CIST10'}%` })
-        .andWhere('game.gamename not like :game2', { game2: `${'CIST3'}%` })
+        .andWhere('game.gamename not like :game1', { game1: `${'CIST'}%` })
         .getMany();
       games = games.concat(game);
     }
@@ -250,8 +248,7 @@ export class QuizService {
     let game = await this.gameRepository
       .createQueryBuilder('game')
       .where('game.field = :field', { field: field })
-      .andWhere('game.gamename not like :game1', { game1: `${'CIST10'}%` })
-      .andWhere('game.gamename not like :game2', { game2: `${'CIST3'}%` })
+      .andWhere('game.gamename not like :game1', { game1: `${'CIST'}%` })
       .getManyAndCount();
     let index = this.randomIndexArray(game[1], count);
 

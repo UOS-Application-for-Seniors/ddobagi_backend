@@ -112,7 +112,7 @@ export class UsersController {
       },
     },
   })
-  async userAddCoin(@Request() req, @Body() coin) {
-    await this.usersService.addCoin(req.user.id, coin);
+  async userAddCoin(@Request() req, @Body() body) {
+    await this.usersService.addCoin(req.user.id, body.coin);
   }
 }

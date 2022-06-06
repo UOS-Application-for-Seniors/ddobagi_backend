@@ -88,13 +88,18 @@ export class SmsService {
     // ACTUALL CODE
     const timestamp = Date.now().toString();
     const contentString =
-      '[Ddobagi]Danger! Your protege is ' +
-      'under DementiaThreat! CISTScore was ' +
+      '[또바기] 위험!' +
+      name +
+      '님이 금일 진행하신 간이 인지 선별 검사 결과, 피보호자분의 인지기능이 기준에 비해서 조금 낮게 나오셨습니다.\n' +
+      name +
+      '님이 이번 간이 인지 선별 검사 결과에서 얻은 점수는 ' +
       score.toString() +
-      ' and standard is ' +
-      standard.toString();
+      '점 이며, 검사 기준 점수는 ' +
+      standard.toString() +
+      '입니다.\n';
+    ('점수가 낮다고 해서 반드시 치매가 있는 것은 아니며 인지기능은 우울이나 건강상의 다양한 원인에 의해서 점수가 낮아질 수 있습니다. 먼저 또바기 놀이와 검사를 지속적으로 해보시고 그럼에도 점수가 계속 낮게 나온다면 기관을 방문하셔서 정밀검사를 받아 보시는 것을 추천드립니다.');
     const body = {
-      type: 'SMS',
+      type: 'LMS',
       contentType: 'COMM',
       countryCode: '82',
       from: '01033045027', // 발신자 번호

@@ -60,6 +60,7 @@ export class RegisterUserDto {
 
   @ApiProperty({ description: '보호자 알림 주기', example: 14 })
   @IsOptional()
+  @Type(() => Number)
   @IsInt()
   readonly NOKNotificationDays: number;
 }

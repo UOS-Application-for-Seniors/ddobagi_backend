@@ -25,11 +25,8 @@ export class SmsService {
     message.push(timestamp);
     message.push(newLine);
     message.push('VrCjxGsF2m4MDshEdCjQ');
-    //message 배열에 위의 내용들을 담아준 후에
     const signature = hmac.update(message.join('')).digest('base64');
-    //message.join('') 으로 만들어진 string 을 hmac 에 담고, base64로 인코딩한다
-    console.log(signature.toString());
-    return signature.toString(); // toString()이 없었어서 에러가 자꾸 났었는데, 반드시 고쳐야함.
+    return signature.toString();
   }
 
   async sendSMS(number: string, score: number): Promise<void> {

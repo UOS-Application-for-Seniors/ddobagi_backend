@@ -110,11 +110,12 @@ export class QuizService {
     });
 
     console.log(quiz);
+    let quizNumber = 3;
     if (quiz[1] < 3) {
-      throw new HttpException('Not Enough Quiz!', HttpStatus.NOT_ACCEPTABLE);
+      quizNumber = 1;
     }
 
-    let randomArray = this.randomIndexArray(quiz[1], 3);
+    let randomArray = this.randomIndexArray(quiz[1], quizNumber);
 
     for (let randomValue of randomArray) {
       let temp = plainToClass(GameDto, quiz[0][randomValue]);

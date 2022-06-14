@@ -126,6 +126,7 @@ export class UsersService {
       .createQueryBuilder(UserRecordEntity, 'record')
       .leftJoinAndSelect('record.game', 'game')
       .orderBy('game.gamename', 'ASC')
+      .andWhere('record.userID = :user', { user: userid })
       .andWhere('game.gamename not like :game1', { game1: `${'CIST'}%` })
       .addOrderBy('difficulty', 'ASC')
       .getMany();

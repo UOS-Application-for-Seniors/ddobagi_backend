@@ -58,7 +58,6 @@ export class UsersController {
   })
   @ApiCreatedResponse({ description: '결과', type: ReturnObject })
   async getUserResult(@Request() req) {
-    console.log(req);
     return this.usersService.getUserResult(req.user.id);
   }
 

@@ -111,7 +111,9 @@ export class QuizService {
 
     console.log(quiz);
     let quizNumber = 3;
-    if (quiz[1] < 3) {
+    if (quiz[1] == 0) {
+      throw new HttpException('Not Enough Quiz!', HttpStatus.NOT_ACCEPTABLE);
+    } else if (quiz[1] < 2) {
       quizNumber = 1;
     }
 
